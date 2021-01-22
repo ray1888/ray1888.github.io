@@ -1,2 +1,2 @@
-# ray1888.github.io
-static blog of mine 
+# blog-hexo-code
+the  blog of  source of code  my blog
