@@ -1,0 +1,440 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.6.1" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.6.1" type="image/png" sizes="32x32"><meta property="og:type" content="website">
+<meta property="og:title" content="Ray 的藏书阁">
+<meta property="og:url" content="http://example.com/page/2/index.html">
+<meta property="og:site_name" content="Ray 的藏书阁">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="Ray Chen">
+<meta name="twitter:card" content="summary"><title>Ray 的藏书阁</title><link ref="canonical" href="http://example.com/page/2/index.html"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.6.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":false},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Ray 的藏书阁</div><div class="header-banner-info__subtitle"></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content content-home" id="content"><section class="postlist"><article class="postlist-item post"><header class="post-header"><h1 class="post-title"><a class="post-title__link" href="/2019/08/28/raft-lab-2/">MIT6.824 Lab2 实现及解析</a></h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2019-08-28</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-01-22</span></span></div></header><div class="post-body"><div class="post-excerpt"><!-- ---
+layout: post
+title:
+author: Ray Chan(ray1888)
+date: '2019-08-20 12:05:38 +0800'
+category: distributed-system
+summary: MIT6.824 Lab2 Implemantation and detail explains
+thumbnail: distributed-db.jpg
+--- -->
+
+
+        <h1 id="目录"   >
+          <a href="#目录" class="heading-link"><i class="fas fa-link"></i></a>目录</h1>
+      <ol>
+<li><a href="#PaperReading">Raft论文阅读</a>  </li>
+<li><a href="#Detail">实现细节</a>    <pre><code> 2.1 [Raft整体流程](#2.1)    
+ 2.2 [Raft状态机维护](#2.2)  
+ 2.3 [Raft代码实现](#2.3)  </code></pre>
+</li>
+</ol>
+
+        <h1 id="论文阅读及问题"   >
+          <a href="#论文阅读及问题" class="heading-link"><i class="fas fa-link"></i></a>论文阅读及问题</h1>
+      <p>论文各个章节主要解析</p>
+<ol>
+<li>总体介绍，解析创造Raft的原因，并且简单描述Raft与Paxos的不同点</li>
+<li>简单介绍一下副本状态机这个概念</li>
+<li>简单描述Paxos的问题（包括了不好理解以及工业化上面的问题）</li>
+<li>阐述Raft为什么比Paxos好理解</li>
+<li>Raft的算法的详细描述以及边界条件</li>
+<li>Raft集群出现成员变动的时候如何处理</li>
+<li>Raft的日志压缩和快照</li>
+<li>Client与Raft集群的交互方式</li>
+</ol>
+<p>实现的时候，重点要看Figure2中所提及的条件。</p>
+
+        <h1 id="代码实现"   >
+          <a href="#代码实现" class="heading-link"><i class="fas fa-link"></i></a>代码实现</h1>
+      
+        <h2 id="Raft整体流程"   >
+          <a href="#Raft整体流程" class="heading-link"><i class="fas fa-link"></i></a>Raft整体流程</h2>
+      <!-- ![Raft整体流程](/assets/img/posts/RaftProcess.png) -->
+<img src="/2019/08/28/raft-lab-2/RaftProcess.png" class="" title="Raft整体流程">
+
+<p>此处只是一个比较简单的忽略具体可能出现错误细节的描述。<br>本质上Raft就是一个通过一个维护一个协程里面的状态机，并且通过其他做网络请求的协程达成大部分节点在共识的算法。<br>具体可以看这里的<img src="https://raft.github.io/" alt="演示动画"></p>
+
+        <h2 id="Raft状态机的转换"   >
+          <a href="#Raft状态机的转换" class="heading-link"><i class="fas fa-link"></i></a>Raft状态机的转换</h2>
+      <!-- ![Raft整体流程](/assets/img/posts/RaftStateMachine.png) -->
+<img src="/2019/08/28/raft-lab-2/RaftStateMachine.png" class="" title="Raft状态机流程">
+
+<p>此处是一个简单状态机的描述，具体转换的原因也已经在图上面有标出来。</p>
+
+        <h2 id="Raft代码的实现"   >
+          <a href="#Raft代码的实现" class="heading-link"><i class="fas fa-link"></i></a>Raft代码的实现</h2>
+      <p>代码实现在这个Lab中实际上分为了3part</p>
+<ol>
+<li>PartA  完成选举</li>
+<li>PartB  完成日志</li>
+<li>PartC  完成持久化的工作，并且处理共识的边界条件</li>
+</ol>
+
+        <h3 id="PartA-的实现"   >
+          <a href="#PartA-的实现" class="heading-link"><i class="fas fa-link"></i></a>PartA 的实现</h3>
+      <p>跟随论文中提及的RequestVote RPC 以及 AppendEntries RPC 实现即可<br>此处可以只需要完成心跳发送后可以保证非主节点不超时，不会使得Term有变动即可。</p>
+<p>一个注意的点，发送这两个RPC的时候，都是需要并行发送的，因此每个请求需要使用一个GoRoutine去进行实现。<br>下面代码就是发送AppendEntries的代码的实例</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">logs :&#x3D; make([]Log, 0)</span><br><span class="line">tmpIndex :&#x3D; min(max(0, rf.nextIndex[number]-1), rf.logs[rf.getLen()].Index)</span><br><span class="line">if tmpIndex &lt; rf.logs[rf.getLen()].Index &#123;</span><br><span class="line">    logs &#x3D; rf.logs[tmpIndex+1-firstIndex:]</span><br><span class="line">    &#x2F;&#x2F;DPrintf(&quot;server %d is Leader, tmpIndex is %d, firstIndex is %d, len of log is %d, commited index is %d&quot;,</span><br><span class="line">    &#x2F;&#x2F;	rf.me, tmpIndex, firstIndex, len(rf.logs), rf.commitedIndex)</span><br><span class="line">&#125;</span><br><span class="line">args :&#x3D; AppendEntriesArgs&#123;Term: rf.currentTerm, LeaderId: rf.me,</span><br><span class="line">    PrevLogTerm: rf.logs[tmpIndex-firstIndex].Term, PrevLogIndex: tmpIndex,</span><br><span class="line">    Entries: logs, Leadercommited: rf.commitedIndex&#125;</span><br><span class="line">&#x2F;&#x2F;  使用Goroutine来发送请求</span><br><span class="line">go func(args AppendEntriesArgs, number int) &#123;</span><br><span class="line">    reply :&#x3D; AppendEntriesReply&#123;&#125;</span><br><span class="line">    ok :&#x3D; rf.sendAppendEntires(number, &amp;args, &amp;reply)</span><br><span class="line">    rf.mu.Lock()</span><br><span class="line">    defer rf.mu.Unlock()</span><br><span class="line">    if !ok &#123;</span><br><span class="line">        DPrintf(&quot;allAppendEntries server %d call remote %d rpc AppendEntries failed&quot;, rf.me, number)</span><br><span class="line">    &#125;</span><br><span class="line">    if args.Term !&#x3D; rf.currentTerm &#123;</span><br><span class="line">        return</span><br><span class="line">    &#125;</span><br><span class="line">    if reply.Term &gt; rf.currentTerm &#123;</span><br><span class="line">        &#x2F;&#x2F;rf.mu.Lock()</span><br><span class="line">        rf.state &#x3D; Follower</span><br><span class="line">        rf.currentTerm &#x3D; reply.Term</span><br><span class="line">        &#x2F;&#x2F; TODO why Term voliate needed to persist?</span><br><span class="line">        rf.persist()</span><br><span class="line">        &#x2F;&#x2F;rf.mu.Unlock()</span><br><span class="line">        return</span><br><span class="line">    &#125;</span><br><span class="line">    if reply.Success &#x3D;&#x3D; true &amp;&amp; rf.state &#x3D;&#x3D; Leader &#123;</span><br><span class="line">        if len(args.Entries) &gt; 0 &#123;</span><br><span class="line">            rf.nextIndex[number] &#x3D; args.Entries[len(args.Entries)-1].Index + 1</span><br><span class="line">            rf.matchIndex[number] &#x3D; rf.nextIndex[number] - 1</span><br><span class="line">            if rf.matchIndex[number] &gt; rf.commitedIndex &#123;</span><br><span class="line">                rf.updateCommit()</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; else if rf.state &#x3D;&#x3D; Leader &#123;</span><br><span class="line">        if rf.nextIndex[number] &gt; reply.PrevIndex+1 &#123;</span><br><span class="line">            rf.nextIndex[number] &#x3D; reply.PrevIndex + 1</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            rf.nextIndex[number] &#x3D; max(rf.nextIndex[number]-1, 1)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;(args, number)</span><br></pre></td></tr></table></div></figure>
+<p>并且注意实现的时候的锁的使用，保证每次使用锁都有加锁和解锁的操作成对出现，否则可能会出现一些比较奇怪的情况。</p>
+
+        <h3 id="PartB的实现"   >
+          <a href="#PartB的实现" class="heading-link"><i class="fas fa-link"></i></a>PartB的实现</h3>
+      <p>此处需要接受模拟从客户端的请求进来然后把Log先放到本地的Log上面，然后把Log同步到其他的节点上面去进行共识的达成。</p>
+<p>首先的条件，需要确保Start函数接受请求的时候必须是Leader的角色，否则不会接收请求。（论文中有提及，此处Raft集群中非Leader节点不会把日志写入的请求转发到Leader节点上，这个是为了维护的方便来做的）</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">func (rf *Raft) Start(command interface&#123;&#125;) (int, int, bool) &#123;</span><br><span class="line">	index :&#x3D; -1</span><br><span class="line">	term :&#x3D; -1</span><br><span class="line">	isLeader :&#x3D; true</span><br><span class="line">	&#x2F;&#x2F; Wanring: do not double add lock for GetState function</span><br><span class="line">	rf.mu.Lock()</span><br><span class="line">	defer rf.mu.Unlock()</span><br><span class="line">	term, isLeader &#x3D; rf.GetState()</span><br><span class="line">	if isLeader &#123;</span><br><span class="line">		index &#x3D; rf.logs[rf.getLen()].Index + 1</span><br><span class="line">		&#x2F;&#x2F;oldLogLen :&#x3D; len(rf.logs)</span><br><span class="line">		rf.logs &#x3D; append(rf.logs, Log&#123;command, term, index&#125;)</span><br><span class="line">		&#x2F;&#x2F;DPrintf(&quot;server %d is Leader. new log has been appended, old length is %d, now is %d.  index number is %d, commitedindex is %d&quot;,</span><br><span class="line">		&#x2F;&#x2F;	rf.me, oldLogLen, len(rf.logs), index, rf.commitedIndex)</span><br><span class="line">		if len(rf.chanNewLog) &#x3D;&#x3D; 0 &#123;</span><br><span class="line">			rf.chanNewLog &lt;- 1</span><br><span class="line">		&#125;</span><br><span class="line">		rf.persist()</span><br><span class="line">	&#125;</span><br><span class="line">	return index, term, isLeader</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+<p>重点处理的地方是nextIndex和MatchIndex 的计算以及维护的问题</p>
+
+        <h4 id="Apply的实现"   >
+          <a href="#Apply的实现" class="heading-link"><i class="fas fa-link"></i></a>Apply的实现</h4>
+      <p>因为对于外部客户端的行为来说，Start函数是一个异步的函数, 所以实际上客户端是通过等待Make函数中输入的ApplyCh来确定能够apply成功，保证对外的原子性</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">func (rf *Raft) doApply() &#123;</span><br><span class="line">	for &#123;</span><br><span class="line">		rf.mu.Lock()</span><br><span class="line">		st :&#x3D; rf.state</span><br><span class="line">		rf.mu.Unlock()</span><br><span class="line">		if st &#x3D;&#x3D; Killed &#123;</span><br><span class="line">			return</span><br><span class="line">		&#125;</span><br><span class="line">		select &#123;</span><br><span class="line">		case &lt;-rf.chanCommit:</span><br><span class="line">			for &#123;</span><br><span class="line">				rf.mu.Lock()</span><br><span class="line">				if !(rf.lastApplied &lt; rf.commitedIndex &amp;&amp; rf.lastApplied &lt; rf.logs[rf.getLen()].Index) &#123;</span><br><span class="line">					rf.mu.Unlock()</span><br><span class="line">					break</span><br><span class="line">				&#125;</span><br><span class="line">				FirstIndex :&#x3D; rf.logs[0].Index</span><br><span class="line">				if rf.lastApplied+1 &gt;&#x3D; FirstIndex &#123;</span><br><span class="line">					index :&#x3D; min(rf.lastApplied+1-FirstIndex, rf.getLen())</span><br><span class="line">					msg :&#x3D; ApplyMsg&#123;CommandValid: true, Command: rf.logs[index].Command, CommandIndex: rf.lastApplied + 1&#125;</span><br><span class="line">					rf.lastApplied++</span><br><span class="line">					rf.mu.Unlock()</span><br><span class="line">					&#x2F;&#x2F;can&#39;t lock when send in channel, dead lock</span><br><span class="line">					&#x2F;&#x2F; canApplychan is to block the new</span><br><span class="line">					rf.chanCanApply &lt;- 1</span><br><span class="line">					rf.chanApplyMsg &lt;- msg</span><br><span class="line">					&lt;-rf.chanCanApply</span><br><span class="line">					rf.mu.Lock()</span><br><span class="line">				&#125;</span><br><span class="line">				rf.mu.Unlock()</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="PartC的实现"   >
+          <a href="#PartC的实现" class="heading-link"><i class="fas fa-link"></i></a>PartC的实现</h3>
+      <p>此处首先需要添加状态机的持久化的方法，并且需要在启动的时候添加一个读取旧的持久化状态机的方法。</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">func (rf *Raft) InstallSnapshot(args *InstallSnapshotArgs, reply *InstallSnapshotReply) &#123;</span><br><span class="line">	rf.chanCanApply &lt;- 1</span><br><span class="line">	rf.mu.Lock()</span><br><span class="line">	reply.Success &#x3D; false</span><br><span class="line">	persistFlag :&#x3D; 0</span><br><span class="line">	if args.Term &lt; rf.currentTerm &#123;</span><br><span class="line">		reply.Term &#x3D; rf.currentTerm</span><br><span class="line">		rf.mu.Unlock()</span><br><span class="line">		&lt;-rf.chanCanApply</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	if rf.currentTerm &lt; args.Term &#123;</span><br><span class="line">		rf.currentTerm &#x3D; args.Term</span><br><span class="line">		rf.ClearChan()</span><br><span class="line">		rf.voteFor &#x3D; -1</span><br><span class="line">		rf.state &#x3D; Follower</span><br><span class="line">		persistFlag &#x3D; 1</span><br><span class="line">	&#125;</span><br><span class="line">	reply.Term &#x3D; rf.currentTerm</span><br><span class="line">	&#x2F;&#x2F; similar to appendEntries receive call</span><br><span class="line">	rf.chanAppendEntries &lt;- 1</span><br><span class="line">	firstIndex :&#x3D; rf.logs[0].Index</span><br><span class="line">	nowIndex :&#x3D; args.LastIncludeIndex - firstIndex</span><br><span class="line">	if nowIndex &lt; 0 &#123;</span><br><span class="line">		if persistFlag &#x3D;&#x3D; 1 &#123;</span><br><span class="line">			rf.persist()</span><br><span class="line">		&#125;</span><br><span class="line">		reply.PrevIndex &#x3D; firstIndex</span><br><span class="line">		rf.mu.Unlock()</span><br><span class="line">		&lt;-rf.chanCanApply</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	rf.logs &#x3D; args.Logs</span><br><span class="line">	rf.lastApplied &#x3D; args.LastIncludeIndex</span><br><span class="line">	rf.commitedIndex &#x3D; args.LeaderCommitIndex</span><br><span class="line">	rf.persister.SaveStateAndSnapshot(rf.getPersistByte(), args.Snapshot)</span><br><span class="line">	msg :&#x3D; ApplyMsg&#123;CommandValid: false, Snapshot: args.Snapshot&#125;</span><br><span class="line">	rf.mu.Unlock()</span><br><span class="line">	rf.chanApplyMsg &lt;- msg</span><br><span class="line">	&lt;-rf.chanCanApply</span><br><span class="line">	reply.Success &#x3D; true</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 启动的时候添加这个方法把Snapshotload出来</span><br><span class="line">rf.readPersist(persister.ReadRaftState())</span><br></pre></td></tr></table></div></figure>
+<p>并且需要注意在投票部分需要根据Safty那里提及的一个重要的地方，如果RequestVote RPC里面的日志Term与目前的Term不是一致的情况下，不能通过数票数的方法来进行计算。这个是为了整个集群的正确来考虑的。</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">func (rf *Raft) updateCommit() &#123;</span><br><span class="line">	N :&#x3D; rf.commitedIndex</span><br><span class="line">	FirstIndex :&#x3D; rf.logs[0].Index</span><br><span class="line">	for i :&#x3D; max(rf.commitedIndex+1, FirstIndex+1); i &lt;&#x3D; rf.logs[rf.getLen()].Index; i++ &#123;</span><br><span class="line">		num :&#x3D; 1</span><br><span class="line">		for j :&#x3D; range rf.peers &#123;</span><br><span class="line">			if j !&#x3D; rf.me &#123;</span><br><span class="line">				if rf.matchIndex[j] &gt;&#x3D; i &#123;</span><br><span class="line">					&#x2F;*</span><br><span class="line">						this part is paper 5.4.2 limit, only can count replicate when log&#39;s term</span><br><span class="line">						is equals to currentTerm</span><br><span class="line">					*&#x2F;</span><br><span class="line">					if rf.logs[i-FirstIndex].Term &#x3D;&#x3D; rf.currentTerm &#123;</span><br><span class="line">						num++</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		if num &gt; len(rf.peers)&#x2F;2 &#123;</span><br><span class="line">			N &#x3D; i</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	if N &gt; rf.commitedIndex &amp;&amp; rf.state &#x3D;&#x3D; Leader &#123;</span><br><span class="line">		rf.commitedIndex &#x3D; min(N, rf.logs[rf.getLen()].Index)</span><br><span class="line">		rf.chanCommit &lt;- 1</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure></div></div></article><article class="postlist-item post"><header class="post-header"><h1 class="post-title"><a class="post-title__link" href="/2019/08/21/intro-distributed-system/">分布式系统概念简介及其问题的描述</a></h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2019-08-21</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-01-22</span></span></div></header><div class="post-body"><div class="post-excerpt"><!-- ---
+
+author: Ray Chan(ray1888)
+date: 2019-08-20 11:07:38
+category: 
+summary: introduction of distributed system and its problem
+thumbnail: distributed-system.png
+--- -->
+
+
+        <h1 id="目录"   >
+          <a href="#目录" class="heading-link"><i class="fas fa-link"></i></a>目录</h1>
+      <ol>
+<li><a href="#Introduction">什么是分布式系统</a>  </li>
+<li><a href="#Purpose">分布式系统能够解决什么问题</a><br>2.1 <a href="#2.1">服务器的性能扩展方案</a><br>2.2 <a href="#2.2">分布式系统的特点</a><br>2.3 <a href="#2.3">分布式系统解决的问题</a>  </li>
+<li><a href="#Problem">分布式系统的问题</a><br>3.1 <a href="#3.1">网络问题</a><br>3.2 <a href="#3.2">时钟问题</a><br>3.3 <a href="#3.3">节点问题</a>  </li>
+<li><a href="#ConditionAssumtion">在不可靠硬件构建可靠软件需要满足的条件和假设</a><br>4.1 <a href="#4.1">真相由多数决定</a><br>4.2 <a href="#4.2">理论系统模型与现实</a>  </li>
+<li><a href="#ShareNote">ShareNote</a>  </li>
+</ol>
+
+        <h1 id="什么是分布式系统"   >
+          <a href="#什么是分布式系统" class="heading-link"><i class="fas fa-link"></i></a>#什么是分布式系统</h1>
+      
+        <h3 id="分布式系统"   >
+          <a href="#分布式系统" class="heading-link"><i class="fas fa-link"></i></a>分布式系统</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; Definantion from IBM Site </span><br><span class="line">A distributed computer system consists of multiple software components that are on multiple computers, but run as a single system. The computers that are in a distributed </span><br><span class="line">system can be physically close together and connected by a local network, or they can be geographically distant and connected by a wide area network. A distributed system can consist of any number of possible configurations, such as mainframes, personal computers, workstations, minicomputers, and so on. The goal of distributed computing is to make such a network work as a single computer.</span><br></pre></td></tr></table></div></figure>
+<p>简述：<br>分布式的计算机系统是由多台形式的计算机（包括服务器、个人电脑、工作站、嵌入式系统的形式）组成的，但是对外表示成一个完整功能的系统。对于分布式系统的使用者，可以把一个大型的分布式系统看作一个黑盒来进行使用。  </p>
+
+        <h1 id="分布式系统能够解决什么问题"   >
+          <a href="#分布式系统能够解决什么问题" class="heading-link"><i class="fas fa-link"></i></a>#分布式系统能够解决什么问题</h1>
+      
+        <h3 id="2-1-服务器的性能扩展方案"   >
+          <a href="#2-1-服务器的性能扩展方案" class="heading-link"><i class="fas fa-link"></i></a>2.1. 服务器的性能扩展方案</h3>
+      <p>对于一个系统来说，如果当需要计算的问题太过庞大的时候，会有两种思路来进行算力的添加  </p>
+<p>1.Scale UP（纵向扩展）<br>纵向扩展:企业后端大型服务器以增加处理器等运算资源进行升级以获得对应用性能的要求。<br>这种是比较传统的思路，具有以下特点：<br>    1. 扩容的成本较高。能够支持纵向扩展的系统都需要服务商进行服务的支持，需要购买特殊的硬件。而不是使用能够通用的硬件来进行扩容<br>    2. 延迟低，单点吞吐量大。本质上是单点的系统，可以减少了很多网络上面的开销，所以延迟一般会比分布式系统的延迟更低。而且单节点如果在没有超过负荷的情况下，因为硬件堆积在上面，单节点的性能一般会比分布式的单节点性能更强。<br>    3. 备份成本高，遇到不可恢复的故障时可能要中断一定时间的服务。如果对于纵向扩展的设备需要进行灾备的情况下，可能需要同时购入相同配置的硬件通过配置主备来继续容灾，而不能通过像分布式系统在多个地域继续节点部署和配置添加达到冗余的程度。<br>  实例的系统： 传统的SAN(storage area network)系统  </p>
+<p>2.Scale Out(水平扩展)<br>水平扩展：企业可以根据需求增加不同的服务器应用，依靠多部服务器协同运算，借负载平衡及容错等功能来提高运算能力及可靠度。<br>这是从谷歌的三篇经典的分布式论文（bigtable、distributed filesystem、 mapreduce)提炼出来的特点：<br>    1. 成本低，扩展性好。使用的是市面上可以购买的通用的服务器配件，并且可以根据需求进行硬件的升级即可提升整体的性能（如存储服务器上面，把HDD更换为全闪存的NVME SSD，立刻可以在读写的吞吐量和时延上面获得具体的提升）<br>    2. 弹性好。可以通过配置动态的增删服务器，可以动态的对业务使用的服务器资源具有更好的调配，并且可以通过弹性的配置获得根据地理位置的容灾以及数据冗余功能（如金融企业中的两地三中心的需求）<br>    3. 处理单节点无法处理的问题。（最重要）  </p>
+
+        <h3 id="2-2-分布式系统的特点"   >
+          <a href="#2-2-分布式系统的特点" class="heading-link"><i class="fas fa-link"></i></a>2.2 分布式系统的特点</h3>
+      <ol>
+<li>扩展性强(Scalability)  </li>
+<li>有冗余(Redundancy)  </li>
+</ol>
+
+        <h3 id="2-3-分布式系统解决的问题"   >
+          <a href="#2-3-分布式系统解决的问题" class="heading-link"><i class="fas fa-link"></i></a>2.3 分布式系统解决的问题</h3>
+      <p>分布式系统最重要解决的问题是：  </p>
+<ol>
+<li>处理单机无法计算的问题。<br>因为问题能够被分治成为了更小的问题，使得更弱的节点也可以进行计算  </li>
+<li>同样的工作量下，减少计算使用的时间。<br>因为部分计算是可以并行来继续执行的，只要调度得当的情况下，可以减少单机系统中出现的等待的情况。  </li>
+<li>在有限的成本内，可以通过多区域部署服务来降低该地区的服务的时延。  </li>
+</ol>
+
+        <h1 id="分布式系统的问题"   >
+          <a href="#分布式系统的问题" class="heading-link"><i class="fas fa-link"></i></a>分布式系统的问题</h1>
+      <p>（此部分有部分会引用到数据密集型应用系统设计（DDIA）的第8章部分的内容）<br>软件工程的世界里面没有银弹，分布式系统并不是所有问题的最优解。它在解决上述问题的情况下也引入了下面的多种问题<br>此处需要引入一个部分失效的概念：  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">部分失效：在分布式系统中，可能会出现系统的一部分工作正常，其他部分出现难以预测的故障。</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="对于互联网服务的分布式系统的假设"   >
+          <a href="#对于互联网服务的分布式系统的假设" class="heading-link"><i class="fas fa-link"></i></a>对于互联网服务的分布式系统的假设</h3>
+      <ol>
+<li>需要7*24的可用状况，所以不能有服务不可用的状态</li>
+<li>采用通用的硬件，故障率会较高，成本较低</li>
+<li>采用IP和以太网的技术，网络可靠性不如专有网络(Fiber Channel等。。。)</li>
+</ol>
+<p>因为上面的三个原因可能引申出来的另外的假设  </p>
+<ol start="4">
+<li>系统越大，局部组件失效的概率越大。（长时间的运行时间，失效、修复、再失效是正常的状况而不能当为异常的情况去考虑）</li>
+<li>由于局部失效的概率高，因此需要必须容忍部分节点失败，并且能够保持对外提供可用的服务</li>
+</ol>
+<p><b><font color="#FF0000">所以实际上我们目前大部分的分布式的系统是需要在不可靠的硬件上面通过软件容错来构建可靠的系统。</font></b></p>
+
+        <h3 id="所以分布式系统遇到的问题可以分为三个大类"   >
+          <a href="#所以分布式系统遇到的问题可以分为三个大类" class="heading-link"><i class="fas fa-link"></i></a>所以分布式系统遇到的问题可以分为三个大类</h3>
+      <ol>
+<li>网络类问题  </li>
+<li>时钟问题  </li>
+<li>节点软件和硬件的问题  </li>
+</ol>
+
+        <h2 id="网络问题"   >
+          <a href="#网络问题" class="heading-link"><i class="fas fa-link"></i></a>网络问题</h2>
+      <p>对于上面的假设（主要是成本考虑）来说，一般都会采用无共享的方式来构建集群。</p>
+<p>由于通常使用的都是以太网来构建，而且以太网是异步的网络。可能会出现下面的这些情况</p>
+<ol>
+<li>请求丢失  </li>
+<li>请求再队列等待，无法发送（网络问题或者接收方繁忙在内核的队列中等待）  </li>
+<li>远程接收节点失效（节点崩溃）  </li>
+<li>远程节点无法响应  </li>
+<li>远程节点有返回，但是返回过程中丢失  </li>
+<li>远程节点处理请求，但是在返回时候被延时处理（优先级问题， 或者网络问题或则和发送方阻塞了）  </li>
+</ol>
+<p>此处需要多引入一个新概念，网络分区</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">网络分区（Network Partition）：当网络的一部分由于网络故障而与其他部分隔开，称之为网络分区或者网络分片</span><br></pre></td></tr></table></div></figure>
+<p>在工程的实践中，网络故障(丢包、链路中断、路由问题、物理设备损坏)的概率是远比想象中高， 因此在基于我们假设的前提的环境下面，必须要把网络分区和网络故障接入到软件中进行容错。</p>
+<p>对于如何处理检测是否故障，需要判断的一个问题是，是节点服务上面出现了真实的故障，还是网络的不可靠导致的服务失效的表现。</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">在实际生产的实践中有这样的方法来快速的在本应用层（网络正常的情况下）来进行简单的判断</span><br><span class="line">1. 通过服务注册的心跳来注册自己的服务存活，并且把死亡状态的服务实例剔除出可用服务中</span><br><span class="line">2. 检测进程是否崩溃，如果崩溃发送一个信号。（或者在我的工作经历中，使用一个进程去定时检测进程是否存活，失败了发送信号使得资源进行重启的尝试，并且上报告警）</span><br><span class="line">3. 通过交换机去查询网络的状况</span><br><span class="line">4. 通过中间件的自身监控（如Rabbitmq的web界面）来监控中间件的执行状况</span><br><span class="line">5. 定期去尝试访问网络是否通达</span><br></pre></td></tr></table></div></figure>
+<p>但是最终我们唯一能够完全判断故障的方法只有超时，来保证节点是不可用的状态（为了保证网络的不可靠问题）。</p>
+
+        <h3 id="超时引入的问题"   >
+          <a href="#超时引入的问题" class="heading-link"><i class="fas fa-link"></i></a>超时引入的问题</h3>
+      <p>我们如何能够判断什么时候才是最好的超时的判断间隔呢？</p>
+<p>对于上面的这个问题， 我们引入两个问题的前置的讨论  </p>
+<ol>
+<li>是什么导致我们会出现网络的不稳定  </li>
+<li>如果出现超时之后，会有怎样的影响，会导致什么样的后果  </li>
+</ol>
+
+        <h4 id="网络不稳定的原因"   >
+          <a href="#网络不稳定的原因" class="heading-link"><i class="fas fa-link"></i></a>网络不稳定的原因</h4>
+      <p>根本的原因： 在设计目前的TCP/IP的协议和方法的时候，我们的目的是为了尽可能高的提高资源的利用率<br>设计的思想： 通过动态分配和竞争的机制使得动态决定那个包被发送，但是这样的方法必然会引入排队的机制  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 出现网络不稳定的原因可能如下</span><br><span class="line">1. 对于交换机的角度，会有多条等待队列来进行数据报文的转发，如果符合过重，则需要等待轮询机制来等待发送的机会，并且如果数据量过多的情况下，也有可能出现数据报文被丢弃，然后被不断重试的现象</span><br><span class="line">2. 在服务器的处理中，因为Linux内核处理接收到的报文也是类似于交换机的处理模式，通过队列来对接受到的包进行排序以及复制到用户态，因此也是需要一定的时间需要处理</span><br><span class="line">3. 在TCP的协议中的重传的机制也会根据返回的报文的控制字段来减小发送窗口的大小来减少对接受方的压力，可能导致排队会提前到发送方的等待队列中。并且重传机制会进行多次的重试，引入了隐形的超时时间</span><br></pre></td></tr></table></div></figure>
+
+        <h4 id="调用超时（网络超时）可能会导致的后果"   >
+          <a href="#调用超时（网络超时）可能会导致的后果" class="heading-link"><i class="fas fa-link"></i></a>调用超时（网络超时）可能会导致的后果</h4>
+      <p>主要的影响是发生了责任的转移，可能带来可能的影响  </p>
+<ol>
+<li>命令的重复执行  </li>
+<li>数据迁移  </li>
+<li>当整个系统处于高负荷的状态，可能会把其他正常的部分通过转移职责导致整个系统被拖垮  </li>
+</ol>
+<p>因此我们必须很小心调整这个超时的阈值,如果在以前的情况下，可能需要系统管理员对于在生产环境的情况下调整一定的参数来慢慢测试得出一个最优值。<br>但是在最近的组建的实现中有两种新的思路</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 通过内部的一个故障检测器来计算成功率来进行对超时阈值的控制（Akka， Cassandra， Hytrsix中有使用此种方法）</span><br><span class="line">2. 通过对数据的采集清洗和分析（AIOPS）（可能是APM(Application Performance Metric)的埋点采集数据以及对监控数据的整体清洗通过一些机器学习的模型来计算出超时的阈值）</span><br></pre></td></tr></table></div></figure>
+
+        <h2 id="时钟问题"   >
+          <a href="#时钟问题" class="heading-link"><i class="fas fa-link"></i></a>时钟问题</h2>
+      <p>分布式的系统的时钟问题也是一个非常值得重视的问题，后面会有我自己的工作案例来说明可能出现的情况的严重性。</p>
+<p>其实对于时间我们一般分为两种的应用方式</p>
+<ol>
+<li>在一段时间内的统计数据（时间段）</li>
+<li>某些时间点是否有指定动作完成或某个历史行为的发生的时间点</li>
+</ol>
+
+        <h3 id="服务器时间的维护方式以及问题"   >
+          <a href="#服务器时间的维护方式以及问题" class="heading-link"><i class="fas fa-link"></i></a>服务器时间的维护方式以及问题</h3>
+      <p>每个机器的时间可以通过两种方式来共同维护</p>
+<ol>
+<li>本地时间（通过主板的石英振荡器来维护）</li>
+<li>通过与一个准确的时间获取源来定是同步时间（NTP和Chrony就是服务于方面的协议）</li>
+</ol>
+<p>这两种的结合不一定能够保证这样的可信赖的分布式集群中的时间就必然是同步的</p>
+<ol>
+<li>本地时间本来每个节点都可能会出现偏差</li>
+<li>同步时间的时候必须通过网络来进行同步，而在我们上面提及的假设中，网络是不可靠的，因此可能会出现失败的情况。 </li>
+<li>NTP如果发现时间差别太大（实际生产中是时间差&gt;=10分钟的情况下）的话会拒绝同步（但是Chrony并没有此问题）</li>
+<li>闰秒的问题</li>
+</ol>
+<p>当然可以像Google维护Spanner集群那样采用高精度的原子钟加上GPS定位来保证错误在一定的可接受范围内运行（一般误差的单位为5微妙）。但是不是每个分布式系统都能够有如此之高的维护成本去使用这种方式来</p>
+
+        <h3 id="时钟的概念"   >
+          <a href="#时钟的概念" class="heading-link"><i class="fas fa-link"></i></a>时钟的概念</h3>
+      <p>时钟可以分解为两个时钟的概念</p>
+<ol>
+<li>物理时钟<br>物理时钟:包括了两种一个是墙上时钟，一个是单调时钟。可以理解为可以通过系统时间相关的API进行获取的时钟。</li>
+<li>逻辑时钟<br>逻辑时钟：可以理解为分布式系统中全局的单调递增的事件ID，事件发生顺序与此相同。</li>
+</ol>
+
+        <h4 id="物理时钟"   >
+          <a href="#物理时钟" class="heading-link"><i class="fas fa-link"></i></a>物理时钟</h4>
+      <p>需要先引入一个时间调整的概念：</p>
+<!-- ![时间跳变说明图](/assets/img/posts/TimeJump.png)   -->
+<img src="/2019/08/21/intro-distributed-system/TimeJump.png" class="" title="时间跳变说明图">
+<p>如果把时间以时间轴的方式来进行表达，往时间变大的方向调整为向前调整，往时间变小的方向调整的是向后调整。<br>只要发生了时间的变动，我们都可以称之为服务器发生了时间跳变。</p>
+<p><b><font color="">1. 墙上时钟 </font> </b><br><br>根据日历返回当前的时钟，就是我们平时在Linux上直接使用date命令或者语言内置的时间相关的api的输出。<br>这种时钟可以与时间同步服务器后同步后进行修改，可能会出现向前调整或者向后调整的可能性</p>
+<p><b><font color="">2. 单调时钟</font></b><br><br>用于： 适合测量持续的时间段<br>单调时钟的特性：<br>    1. 保证只会向前调整<br>    2. 不需要进行同步    </p>
+
+        <h4 id="计算和调整的方式"   >
+          <a href="#计算和调整的方式" class="heading-link"><i class="fas fa-link"></i></a>计算和调整的方式</h4>
+      <p>在一个时间点进行对单调时间的获取，然后完成某项工作后，再去检查时间。但是这段时间的差值并没有太大的意义。</p>
+
+        <h4 id="时间与事件的顺序问题"   >
+          <a href="#时间与事件的顺序问题" class="heading-link"><i class="fas fa-link"></i></a>时间与事件的顺序问题</h4>
+      <p>当两个客户端对于一个分布式的数据库（非Raft或者Paxos类型，如Riak）分别进行写入的情况下（此处假设先写入的客户端为A，晚写入的客户端为B）  </p>
+<!-- ![事件与时序冲突](/assets/img/posts/Time&EventMissmatch.png) -->
+<img src="/2019/08/21/intro-distributed-system/Time&EventMissmatch.png" class="" title="事件与时序冲突">
+<p>当B虽然在发生的时间比A要晚，但是B在集群中同步完成的时间比A要早的情况写。即对外部来说A还未写入成功的情况下，先执行了B的操作，可能导致B的操作丢失（如果B的操作是依赖于A先写入的操作）。<br>上面是一个非常经典的关于分布式集群时间与事件的顺序问题。然而这种问题即使在时间同步服务精度再再提高的情况下，也无法保证它的执行的顺序与时间是一致的。  </p>
+
+        <h4 id="工作上发生过与物理时间相关的问题"   >
+          <a href="#工作上发生过与物理时间相关的问题" class="heading-link"><i class="fas fa-link"></i></a>工作上发生过与物理时间相关的问题</h4>
+      <p><b>问题1： 发生时间跳变后，导致任务的调度器不再调度任务的情况  </b>  </p>
+<!-- ![调度器时间跳变问题](/assets/img/posts/SchdulerTimeJump.png)   -->
+<img src="/2019/08/21/intro-distributed-system/SchdulerTimeJump.png" class="" title="调度器时间跳变问题">
+<pre><code>现象的描述： 
+调度器默认应该定时把任务调度到线程上面，但是查看日志后发现任务并没有被调度   
+原因解释：    
+时间发生了向后的跳变，但是跳变的幅度大于调度的间隔，导致系统中认为调度成功，之后就没有追踪下面的状态（因为当时那部分代码的实现是再调度的时候修改调度的时间为last调度时间）    
+解决方法：    
+把时间从墙上时间更换为单调时间，然后添加检查执行的间隔即可。  </code></pre>
+<p><b>问题2：同步时间后，由于时间差溢出导致结果溢出的问题  </b><br><br>    现象描述：<br>    从Ceph Mgr获取单个采集数据的情况下，然后发现数据变得异常的大，是一个int64是随机数<br>    原因解释：<br>    因为采用的是墙上的时候，但是发生了时间的向后调变，导致计算出来的值发生异常<br>    解决方法：<br>    把墙上时间更换为单调时间  </p>
+
+        <h4 id="逻辑时钟"   >
+          <a href="#逻辑时钟" class="heading-link"><i class="fas fa-link"></i></a>逻辑时钟</h4>
+      <p>做法： 需要一个全局的单调递增的ID。<br>但是是否可以使用同步后的时间来做呢？<br>答： 不可以。因为还是时间精度的不确定性。</p>
+
+        <h2 id="节点本身的问题（硬件和软件）"   >
+          <a href="#节点本身的问题（硬件和软件）" class="heading-link"><i class="fas fa-link"></i></a>节点本身的问题（硬件和软件）</h2>
+      <p>比较极端但是可能出现率比较高的场景是进程出现暂停的情况</p>
+<ol>
+<li>带GC的编程语言的GC(Garbage collection) halt</li>
+<li>虚拟化环境的虚拟机的暂停</li>
+<li>电脑发生休眠或者断电</li>
+<li>上下文切换的情况下卡住了</li>
+<li>执行同步磁盘的操作的时候（如fsync操作）</li>
+<li>接收到信号导致进程退出的情况下</li>
+</ol>
+
+        <h1 id="在不可靠硬件构建可靠软件需要满足的条件和假设"   >
+          <a href="#在不可靠硬件构建可靠软件需要满足的条件和假设" class="heading-link"><i class="fas fa-link"></i></a>#在不可靠硬件构建可靠软件需要满足的条件和假设</h1>
+      <p>此部分为DDIA第8章的描述总结，可以理解成为读书笔记    </p>
+
+        <h2 id="真相由多数决定（重要的判定条件）"   >
+          <a href="#真相由多数决定（重要的判定条件）" class="heading-link"><i class="fas fa-link"></i></a>真相由多数决定（重要的判定条件）</h2>
+      <p>节点不能通过自己的信息来判断自身的状态。因为节点可能出现失效、假死、甚至无法恢复的状况.可能出现的场景如下</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 节点成功收到请求，但是因为路由问题，无法进行返回，超时后而被判失效</span><br><span class="line">2. 半断开的节点发现自己的信息没有被其他节点所确认，意识到自己网络出现问题</span><br><span class="line">3. GC halt导致无法接受请求，但是对于应用来说，切回到工作状态时候，自身状态没有变化</span><br></pre></td></tr></table></div></figure>
+<p>以上的多种情景都是实际出现问题，但是自身的状态并不会改变，因为没有收到其他节点的通知，它会一直维持原来的状态。<br>所以分布式的算法依赖节点间的相互投票与最小投票数（使用Quorum机制，m&gt;=(n+1)/2）进行对比来产生结果,由于一个集群不会存在两个多数在同事做出相互冲突的决定，减少对特定节点的依赖。</p>
+<p>基于上面所提及节点不能通过自己的信息来判断自己的状态，我们讨论一个比较常见的问题，主节点与锁是比较常见的使用方法</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">可能的出现的场景</span><br><span class="line">1. 只允许一个节点作为数据库分区的主节点（Multi-Raft是其中的一种实现）</span><br><span class="line">2. 只允许一个事务或者客户端持有特定资源的锁，以防止同时并发写入带来的数据被破坏的问题</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="如果由自己的状态决定可能会出现的问题"   >
+          <a href="#如果由自己的状态决定可能会出现的问题" class="heading-link"><i class="fas fa-link"></i></a>如果由自己的状态决定可能会出现的问题</h3>
+      <p>但是此处我们的假设时在分布式系统中，那么有可能出现节点中间出现了角色的切换，但是如果不加以对状态的判断，可能会出现这样的问题<br>问题描述  </p>
+<!-- ![客户端锁问题](/assets/img/posts/lockingproblem.png)   -->
+<img src="/2019/08/21/intro-distributed-system/lockingproblem.png" class="" title="客户端锁问题">
+<p>客户端写入存储的时候需要先从分布式服务中获取锁，有两个客户端在线，客户端A先从服务中获取锁，然后发生了进程halt状态（可能是GC或者其他的原因）<br>如果不加判断的情况下，在客户端A halt的状态的情况下，客户端B获得锁并且写入存储成功，然后客户端A从Halt状态中回复正常，客户端A认为锁还在，然后写入存储，<br>如果两个客户端写入的是同一个文件的话，数据可能会出现问题。  </p>
+
+        <h3 id="解决上面的问题"   >
+          <a href="#解决上面的问题" class="heading-link"><i class="fas fa-link"></i></a>解决上面的问题</h3>
+      <p>对于上面的问题，我们可以使用一个Fencing令牌来解决这个问题。(此机制到后面的文章还会继续详细讲解)  </p>
+<!-- ![Fencing令牌解决锁问题](/assets/img/posts/lockingproblem2.png)   -->
+<img src="/2019/08/21/intro-distributed-system/lockingproblem2.png" class="" title="Fencing令牌解决锁问题">
+<p>我们在客户端A获取锁的时候给令牌赋予一个值，为33。 在客户端B获取锁的时候赋予一个令牌值34。<br>当B写入完成后，存储会把已写入令牌改为34，下一次分发的令牌为35， 这样的话，如果A带上33的令牌写入的时候直接被拒绝，能够保证一致性。<br>实际上上面这种方法不仅加上了一个令牌，而且在服务器端会有一个关于令牌的校验。这种做法非常常见。</p>
+
+        <h2 id="理论系统模型与现实"   >
+          <a href="#理论系统模型与现实" class="heading-link"><i class="fas fa-link"></i></a>理论系统模型与现实</h2>
+      <p>对于一个在现实中能够容错的分布式系统，我们需要对预期的系统错误证明形式化的描述。我们通过定义部分的系统模型来形式化描述算法的前提条件。 </p>
+<h3><b><span class="thirdtitle">计时模型</span></b></h3>
+#### 同步模型
+假定有上界网络延迟和上界进程的暂停和上界时钟误差。（但是这个模型一般不存在，因为以太网的不可靠性，除非使用更加稳定的网络介质，并且使用高精度时间设备同步）
+#### 部分同步模型
+大多数情况下像一个同步系统运行，但是会有超出网络延迟，进程暂停和时钟漂移的上界。这个就是比较现实的模型，就是上面我们提到的真实环境可能出现的情况的总和。而且大部分时间比较稳定，小部分时间会有背离，但是发生背离就会出现三者中的组合的情况出现。
+#### 异步模型
+
+
+<h3><b><span class="thirdtitle">节点失效模型</span></b></h3>
+#### 崩溃-中止模型
+节点以一种特定的方式发生故障，故障后，出现系统崩溃，并且节点不会再添加进入集群中，无法恢复
+#### 崩溃-恢复模型
+节点可能会在任何时候发生崩溃，并且会在未知的时间长度来进行恢复。但是节点上只要持久性存储的数据都可以在恢复之后得以保存，内存的状态会消失。
+#### 拜占庭失效
+在非可信任的集群中进行共识的计算，可能会出现作弊、欺诈的操作（区块链上面的假设的环境）  
+所以满足我们实际生产环境（互联网或者企业内部的环境）的是 部分同步模型+ 崩溃恢复模型的组合。
+
+<p>我们目前的分布式的环境是 崩溃-恢复模型+ 部分同步的模型 </p>
+
+        <h3 id="分布式共识算法的正确性必须要有以下的性质"   >
+          <a href="#分布式共识算法的正确性必须要有以下的性质" class="heading-link"><i class="fas fa-link"></i></a>分布式共识算法的正确性必须要有以下的性质</h3>
+      <ol>
+<li>唯一性<br>两个令牌不能获得相同的值  </li>
+<li>单调递增<br>如果请求x返回令牌tx， 请求y返回了令牌ty, 且x在y开始之前先完成，tx &lt; ty  </li>
+<li>可用性<br>请求令牌的节点如果不发生崩溃最终一定能收到响应（无论是对应用来说正确或者错误的回答）  </li>
+</ol>
+
+        <h4 id="分布式共识算法的安全性和活性"   >
+          <a href="#分布式共识算法的安全性和活性" class="heading-link"><i class="fas fa-link"></i></a>分布式共识算法的安全性和活性</h4>
+      <p>在正确性中其实可以再进行细分分为安全性和活性（理解上，并非准确的定义，准确的定义可以查看FLP的理论）：<br>安全性： 没有发生意外<br>活性： 预期的事情一定会发生（最终会发生）  </p>
+<p>如果违反了安全的属性，我们可以找到发生特定时间的时间点。但是违反安全属性的事件发生，必定不可逆，数据丢失。<br>活性的话无法明确具体发生的时间点，但是希望再未来某个时间点能够达到要求。  </p>
+
+        <h1 id="ShareNote"   >
+          <a href="#ShareNote" class="heading-link"><i class="fas fa-link"></i></a>ShareNote</h1>
+      <p>PS: 文章中部分的图来源是来自于《数据密集型应用系统设计》，为PDF翻译的截图，截图的引用在<span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/hyhlinux/DDIA/blob/master/ch8.md" >此处</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span>。如果涉及到版权的问题，请通知我，我会使用工具继续重画。</p>
+<ol>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://www.ibm.com/support/knowledgecenter/en/SSAL2T_8.2.0/com.ibm.cics.tx.doc/concepts/c_wht_is_distd_comptg.html" >IBM Defination of Distributed System</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://book.douban.com/subject/30329536/" >数据密集型应用系统设计</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://www.the-paper-trail.org/post/2008-08-13-a-brief-tour-of-flp-impossibility/" >FLP Impossibility</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Byzantine_fault" >拜占庭错误</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://www.usenix.org/legacy/events/osdi99/full_papers/castro/castro_html/castro.html" >拜占庭容错</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/basho/riak_core" >Riak</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+</ol>
+</div></div></article><article class="postlist-item post"><header class="post-header"><h1 class="post-title"><a class="post-title__link" href="/2019/08/20/mit-6824/">MIT6.824课程的简介以及学习的原因</a></h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2019-08-20</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-01-22</span></span></div></header><div class="post-body"><div class="post-excerpt">
+        <h1 id="MIT6-824"   >
+          <a href="#MIT6-824" class="heading-link"><i class="fas fa-link"></i></a>MIT6.824</h1>
+      <p>MIT6.824是一门对于分布式系统的讲解和实验的课程。</p>
+
+        <h2 id="课程自述"   >
+          <a href="#课程自述" class="heading-link"><i class="fas fa-link"></i></a>课程自述</h2>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">6.824 is a core 12-unit graduate subject with lectures, readings, programming labs, an optional project, a mid-term exam, and a final exam.</span><br><span class="line">It will present abstractions and implementation techniques for engineering distributed systems.</span><br><span class="line">Major topics include fault tolerance, replication, and consistency. Much of the class consists of studying </span><br><span class="line">and discussing case studies of distributed systems.</span><br><span class="line"></span><br><span class="line">翻译：</span><br><span class="line">6.824是一门集合了讲座、阅读、编程实验、附加课程、中期考试和期末考试的课程。他会展示能够为构建一个分布式系统的抽象和实现的技巧。本课程主要讨论的是容错、副本冗余、以及一致性相关的问题。大部分的课程都是由学习和讨论分布式系统的案例来组成的。</span><br></pre></td></tr></table></div></figure>
+<p>因此MIT6.824是一门学习分布式系统的一门比较好的课程。</p>
+
+        <h2 id="所需能力"   >
+          <a href="#所需能力" class="heading-link"><i class="fas fa-link"></i></a>所需能力</h2>
+      <p>完成了整个实验之后，我总结了一下学习整个过程所需要的基础的能力（在后面的文章中也会继续提及到，此处只是为了做一个简单的Summary）</p>
+<ol>
+<li><p>阅读论文的能力<br>阅读论文不仅仅是快速阅读论文，掌握大意的能力，并且需要当实现遇到问题时，回顾论文是否能够找出代码实现中与论文描述的细节中是否一致的能力</p>
+</li>
+<li><p>根据日志进行Debug的能力<br>因为在此实验中，Debug是不可能使用Ide来进行大量的打点操作来进行Debug。（实验中会有多个实例并且可能会出现多个并发操作的情况）因此需要学会在运行项目给的测试中去尝试打有用的Log来进行Debug。</p>
+</li>
+</ol>
+<p>此外，还需要在脑中浮现出一个整个代码运行的逻辑图和实际代码执行的走向图的对比（如果暂时没用这种能力的话，可以先用纸和笔全部把它画出来。俗话说的好：好记性不如烂笔头），这样能快速定位到代码的问题可能会在哪一部分出现问题。</p>
+<ol start="3">
+<li>耐心&amp;细致<br>因为这其实是我第二次做这个实验，第一次只是做完lab2就已经放弃了。究其原因，一个很重要的部分是之前并没有仔细的阅读lab代码中的上面的很多注释和MITLab实验页的上面的Hint和注意的点。所以先把那些全部看完,然后全局思考完成之后再开始动手写代码的实现。</li>
+</ol>
+<p>并且遇到困难的时候，跑到失败的TestCase上面去详细的Debug问题是什么原因。本实验中可能出现很多的实现问题是与锁和Go Channel的使用相关的问题。</p>
+
+        <h2 id="课程中需要实现的代码"   >
+          <a href="#课程中需要实现的代码" class="heading-link"><i class="fas fa-link"></i></a>课程中需要实现的代码</h2>
+      <ol>
+<li>完成简易版的MapReduce</li>
+<li>根据论文完成Raft的协议的实现（工业版的实现可以查看（2）Tikv和（3）Etcd上面的实现）</li>
+<li>基于2中的Raft共识层，实现一个简易版的带副本冗余的KV数据库</li>
+<li>基于2中的Raft共识层，实现一个带调度的Multi-raft的简易实现</li>
+</ol>
+
+        <h2 id="ShareNote"   >
+          <a href="#ShareNote" class="heading-link"><i class="fas fa-link"></i></a>ShareNote:</h2>
+      <ol>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/" >HomePage for MIT6.824</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/tikv/tikv" >tikv</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/etcd-io/etcd" >etcd</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://www.zhihu.com/question/24750289/answer/111351130" >知乎上关于分布式课程的推荐</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://www.zhihu.com/question/29597104" >知乎上关于学习MIT6.824的建议</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+</ol>
+</div></div></article></section><nav class="paginator"><div class="paginator-inner"><a class="extend prev" rel="prev" href="/"><i class="fas fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span></div></nav></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><section class="sidebar-toc hide"></section><!-- ov = overview--><section class="sidebar-ov"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/header.jpeg" alt="avatar"></div><p class="sidebar-ov-author__text">Believe in Goods in People</p></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">13</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">0</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">5</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Ray Chen</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.3.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.6.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="/js/utils.js?v=2.6.1"></script><script src="/js/stun-boot.js?v=2.6.1"></script><script src="/js/scroll.js?v=2.6.1"></script><script src="/js/header.js?v=2.6.1"></script><script src="/js/sidebar.js?v=2.6.1"></script></body></html>

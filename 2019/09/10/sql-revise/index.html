@@ -1,0 +1,396 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.6.1" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.6.1" type="image/png" sizes="32x32"><meta name="description" content="目录        Join 1.1 基本Join类型 1.2 高级Join类型 视图和子查询 2.1 视图 2.2 子查询   基本语法 3.1 Select 3.2 OrderBy 3.3 Update 3.4 Delete   Having &amp; GroupBy   注意事项   ShareNote">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQL复习">
+<meta property="og:url" content="http://example.com/2019/09/10/sql-revise/index.html">
+<meta property="og:site_name" content="Ray 的藏书阁">
+<meta property="og:description" content="目录        Join 1.1 基本Join类型 1.2 高级Join类型 视图和子查询 2.1 视图 2.2 子查询   基本语法 3.1 Select 3.2 OrderBy 3.3 Update 3.4 Delete   Having &amp; GroupBy   注意事项   ShareNote">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2019/09/10/sql-revise/INNER_JOIN.png">
+<meta property="og:image" content="http://example.com/2019/09/10/sql-revise/LEFT_JOIN.png">
+<meta property="og:image" content="http://example.com/2019/09/10/sql-revise/RIGHT_JOIN.png">
+<meta property="og:image" content="http://example.com/2019/09/10/sql-revise/FULL_OUTER_JOIN.png">
+<meta property="og:image" content="http://example.com/2019/09/10/sql-revise/LEFT_EXCLUDING_JOIN.png">
+<meta property="og:image" content="http://example.com/2019/09/10/sql-revise/RIGHT_EXCLUDING_JOIN.png">
+<meta property="og:image" content="http://example.com/2019/09/10/sql-revise/OUTER_EXCLUDING_JOIN.png">
+<meta property="og:image" content="http://example.com/2019/09/10/sql-revise/Union-1.png">
+<meta property="og:image" content="http://example.com/2019/09/10/sql-revise/Union-2.png">
+<meta property="og:image" content="http://example.com/2019/09/10/sql-revise/Union-3.png">
+<meta property="article:published_time" content="2019-09-10T02:05:38.000Z">
+<meta property="article:modified_time" content="2021-01-22T06:37:38.183Z">
+<meta property="article:author" content="Ray Chen">
+<meta property="article:tag" content="SQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2019/09/10/sql-revise/INNER_JOIN.png"><title>SQL复习 | Ray 的藏书阁</title><link ref="canonical" href="http://example.com/2019/09/10/sql-revise/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.6.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":false},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Ray 的藏书阁</div><div class="header-banner-info__subtitle"></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">SQL复习</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2019-09-10</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-01-22</span></span></div></header><div class="post-body"><!-- ---
+layout: post
+title: SQL复习
+author: Ray Chan(ray1888)
+date: '2019-09-10 10:05:38 +0800'
+category: sql
+summary: sql-revise for interview 
+thumbnail: sql.jfif
+--- -->
+
+
+        <h1 id="目录"   >
+          <a href="#目录" class="heading-link"><i class="fas fa-link"></i></a>目录</h1>
+      <ol>
+<li><a href="#Join">Join</a><br> 1.1 <a href="#BasicJoin">基本Join类型</a><br> 1.2 <a href="#AdvanceJoin">高级Join类型</a></li>
+<li><a href="#ViewNSubquery">视图和子查询</a><br> 2.1 <a href="#View">视图</a><br> 2.2 <a href="#Subquery">子查询</a>  </li>
+<li><a href="#Gramma">基本语法</a><br> 3.1 <a href="#Select">Select</a><br> 3.2 <a href="#OrderBy">OrderBy</a><br> 3.3 <a href="#Update">Update</a><br> 3.4 <a href="#Delete">Delete</a>  </li>
+<li><a href="#HavingNGroupBy">Having &amp; GroupBy</a>  </li>
+<li><a href="#Notice">注意事项</a>  </li>
+<li><a href="#ShareNote">ShareNote</a>  </li>
+</ol>
+
+        <h1 id="目的"   >
+          <a href="#目的" class="heading-link"><i class="fas fa-link"></i></a>目的</h1>
+      <p>因为之前工作上面一直使用Python的ORM，然后很少使用手写SQL，因此需要回顾一些Sql的用法。</p>
+
+        <h1 id="Join"   >
+          <a href="#Join" class="heading-link"><i class="fas fa-link"></i></a>Join</h1>
+      
+        <h2 id="此处所提及的表的数据和表类型"   >
+          <a href="#此处所提及的表的数据和表类型" class="heading-link"><i class="fas fa-link"></i></a>此处所提及的表的数据和表类型</h2>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">TABLE_A</span><br><span class="line">  PK Value</span><br><span class="line">---- ----------</span><br><span class="line">   1 FOX</span><br><span class="line">   2 COP</span><br><span class="line">   3 TAXI</span><br><span class="line">   6 WASHINGTON</span><br><span class="line">   7 DELL</span><br><span class="line">   5 ARIZONA</span><br><span class="line">   4 LINCOLN</span><br><span class="line">  10 LUCENT</span><br><span class="line"></span><br><span class="line">TABLE_B</span><br><span class="line">  PK Value</span><br><span class="line">---- ----------</span><br><span class="line">   1 TROT</span><br><span class="line">   2 CAR</span><br><span class="line">   3 CAB</span><br><span class="line">   6 MONUMENT</span><br><span class="line">   7 PC</span><br><span class="line">   8 MICROSOFT</span><br><span class="line">   9 APPLE</span><br><span class="line">  11 SCOTCH</span><br></pre></td></tr></table></div></figure>
+
+        <h2 id="基本Join类型"   >
+          <a href="#基本Join类型" class="heading-link"><i class="fas fa-link"></i></a>基本Join类型</h2>
+      
+        <h3 id="InnerJoin"   >
+          <a href="#InnerJoin" class="heading-link"><i class="fas fa-link"></i></a>InnerJoin</h3>
+      <!-- ![InnerJoin](/assets/img/posts/sqlJoin/INNER_JOIN.png) -->
+<img src="/2019/09/10/sql-revise/INNER_JOIN.png" class="" title="InnerJoin">
+
+<p>求表A与表B数据的交集部分    </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">-- INNER JOIN</span><br><span class="line">SELECT A.PK AS A_PK, A.Value AS A_Value,</span><br><span class="line">       B.Value AS B_Value, B.PK AS B_PK</span><br><span class="line">FROM Table_A A</span><br><span class="line">INNER JOIN Table_B B</span><br><span class="line">ON A.PK &#x3D; B.PK</span><br><span class="line"></span><br><span class="line">A_PK A_Value    B_Value    B_PK</span><br><span class="line">---- ---------- ---------- ----</span><br><span class="line">   1 FOX        TROT          1</span><br><span class="line">   2 COP        CAR           2</span><br><span class="line">   3 TAXI       CAB           3</span><br><span class="line">   6 WASHINGTON MONUMENT      6</span><br><span class="line">   7 DELL       PC            7</span><br><span class="line"></span><br><span class="line">(5 row(s) affected)</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="LeftJoin"   >
+          <a href="#LeftJoin" class="heading-link"><i class="fas fa-link"></i></a>LeftJoin</h3>
+      <!-- ![InnerJoin](/assets/img/posts/sqlJoin/LEFT_JOIN.png) -->
+<img src="/2019/09/10/sql-revise/LEFT_JOIN.png" class="" title="LeftJoin">
+
+<p>选取表A的所有数据, 在此例子中，如果表B不存在对应查询的ID的时候，则会填入Null  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">-- LEFT JOIN</span><br><span class="line">SELECT A.PK AS A_PK, A.Value AS A_Value,</span><br><span class="line">B.Value AS B_Value, B.PK AS B_PK</span><br><span class="line">FROM Table_A A</span><br><span class="line">LEFT JOIN Table_B B</span><br><span class="line">ON A.PK &#x3D; B.PK</span><br><span class="line"></span><br><span class="line">A_PK A_Value    B_Value    B_PK</span><br><span class="line">---- ---------- ---------- ----</span><br><span class="line">   1 FOX        TROT          1</span><br><span class="line">   2 COP        CAR           2</span><br><span class="line">   3 TAXI       CAB           3</span><br><span class="line">   4 LINCOLN    NULL       NULL</span><br><span class="line">   5 ARIZONA    NULL       NULL</span><br><span class="line">   6 WASHINGTON MONUMENT      6</span><br><span class="line">   7 DELL       PC            7</span><br><span class="line">  10 LUCENT     NULL       NULL</span><br><span class="line"></span><br><span class="line">(8 row(s) affected)</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="RightJoin"   >
+          <a href="#RightJoin" class="heading-link"><i class="fas fa-link"></i></a>RightJoin</h3>
+      <!-- ![InnerJoin](/assets/img/posts/sqlJoin/RIGHT_JOIN.png) -->
+<img src="/2019/09/10/sql-revise/RIGHT_JOIN.png" class="" title="RightJoin">
+
+<p>选取表B的所有数据，在此例子中，如果表A不存在对应查询的ID的时候，则会填入Null  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">-- RIGHT JOIN</span><br><span class="line">SELECT A.PK AS A_PK, A.Value AS A_Value,</span><br><span class="line">B.Value AS B_Value, B.PK AS B_PK</span><br><span class="line">FROM Table_A A</span><br><span class="line">RIGHT JOIN Table_B B</span><br><span class="line">ON A.PK &#x3D; B.PK</span><br><span class="line"></span><br><span class="line">A_PK A_Value    B_Value    B_PK</span><br><span class="line">---- ---------- ---------- ----</span><br><span class="line">   1 FOX        TROT          1</span><br><span class="line">   2 COP        CAR           2</span><br><span class="line">   3 TAXI       CAB           3</span><br><span class="line">   6 WASHINGTON MONUMENT      6</span><br><span class="line">   7 DELL       PC            7</span><br><span class="line">NULL NULL       MICROSOFT     8</span><br><span class="line">NULL NULL       APPLE         9</span><br><span class="line">NULL NULL       SCOTCH       11</span><br><span class="line"></span><br><span class="line">(8 row(s) affected)</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="OuterJoin"   >
+          <a href="#OuterJoin" class="heading-link"><i class="fas fa-link"></i></a>OuterJoin</h3>
+      <!-- ![InnerJoin](/assets/img/posts/sqlJoin/FULL_OUTER_JOIN.png) -->
+<img src="/2019/09/10/sql-revise/FULL_OUTER_JOIN.png" class="" title="FullOuterJoin">
+
+<p>选取表A与表B的数据的全集,当另一张表缺失的情况下，会填补NUll信息  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">-- OUTER JOIN</span><br><span class="line">SELECT A.PK AS A_PK, A.Value AS A_Value,</span><br><span class="line">B.Value AS B_Value, B.PK AS B_PK</span><br><span class="line">FROM Table_A A</span><br><span class="line">FULL OUTER JOIN Table_B B</span><br><span class="line">ON A.PK &#x3D; B.PK</span><br><span class="line"></span><br><span class="line">A_PK A_Value    B_Value    B_PK</span><br><span class="line">---- ---------- ---------- ----</span><br><span class="line">   1 FOX        TROT          1</span><br><span class="line">   2 COP        CAR           2</span><br><span class="line">   3 TAXI       CAB           3</span><br><span class="line">   6 WASHINGTON MONUMENT      6</span><br><span class="line">   7 DELL       PC            7</span><br><span class="line">NULL NULL       MICROSOFT     8</span><br><span class="line">NULL NULL       APPLE         9</span><br><span class="line">NULL NULL       SCOTCH       11</span><br><span class="line">   5 ARIZONA    NULL       NULL</span><br><span class="line">   4 LINCOLN    NULL       NULL</span><br><span class="line">  10 LUCENT     NULL       NULL</span><br><span class="line"></span><br><span class="line">(11 row(s) affected)</span><br></pre></td></tr></table></div></figure>
+
+        <h2 id="高级Join类型"   >
+          <a href="#高级Join类型" class="heading-link"><i class="fas fa-link"></i></a>高级Join类型</h2>
+      
+        <h3 id="LEFT-JOIN-EXCLUDING-INNER-JOIN"   >
+          <a href="#LEFT-JOIN-EXCLUDING-INNER-JOIN" class="heading-link"><i class="fas fa-link"></i></a>LEFT JOIN EXCLUDING INNER JOIN</h3>
+      <!-- ![LeftJoin](/assets/img/posts/sqlJoin/LEFT_EXCLUDING_JOIN.png) -->
+<img src="/2019/09/10/sql-revise/LEFT_EXCLUDING_JOIN.png" class="" title="LeftExcludeJoin">
+
+<p>选择A与B中，A没有与B有交集的部分  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">-- LEFT EXCLUDING JOIN</span><br><span class="line">SELECT A.PK AS A_PK, A.Value AS A_Value,</span><br><span class="line">B.Value AS B_Value, B.PK AS B_PK</span><br><span class="line">FROM Table_A A</span><br><span class="line">LEFT JOIN Table_B B</span><br><span class="line">ON A.PK &#x3D; B.PK</span><br><span class="line">WHERE B.PK IS NULL</span><br><span class="line"></span><br><span class="line">A_PK A_Value    B_Value    B_PK</span><br><span class="line">---- ---------- ---------- ----</span><br><span class="line">   4 LINCOLN    NULL       NULL</span><br><span class="line">   5 ARIZONA    NULL       NULL</span><br><span class="line">  10 LUCENT     NULL       NULL</span><br><span class="line">(3 row(s) affected)</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="RIGHT-JOIN-EXCLUDING-INNER-JOIN"   >
+          <a href="#RIGHT-JOIN-EXCLUDING-INNER-JOIN" class="heading-link"><i class="fas fa-link"></i></a>RIGHT JOIN EXCLUDING INNER JOIN</h3>
+      <!-- ![InnerJoin](/assets/img/posts/sqlJoin/RIGHT_EXCLUDING_JOIN.png) -->
+<img src="/2019/09/10/sql-revise/RIGHT_EXCLUDING_JOIN.png" class="" title="RightExcludeJoin">
+
+
+<p>选择A与B中，B没有与A有交集的部分  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">-- RIGHT EXCLUDING JOIN</span><br><span class="line">SELECT A.PK AS A_PK, A.Value AS A_Value,</span><br><span class="line">B.Value AS B_Value, B.PK AS B_PK</span><br><span class="line">FROM Table_A A</span><br><span class="line">RIGHT JOIN Table_B B</span><br><span class="line">ON A.PK &#x3D; B.PK</span><br><span class="line">WHERE A.PK IS NULL</span><br><span class="line"></span><br><span class="line">A_PK A_Value    B_Value    B_PK</span><br><span class="line">---- ---------- ---------- ----</span><br><span class="line">NULL NULL       MICROSOFT     8</span><br><span class="line">NULL NULL       APPLE         9</span><br><span class="line">NULL NULL       SCOTCH       11</span><br><span class="line"></span><br><span class="line">(3 row(s) affected)</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="OUTER-JOIN-EXCLUDING-INNER-JOIN"   >
+          <a href="#OUTER-JOIN-EXCLUDING-INNER-JOIN" class="heading-link"><i class="fas fa-link"></i></a>OUTER JOIN EXCLUDING INNER JOIN</h3>
+      <!-- ![InnerJoin](/assets/img/posts/sqlJoin/OUTER_EXCLUDING_JOIN.png) -->
+<img src="/2019/09/10/sql-revise/OUTER_EXCLUDING_JOIN.png" class="" title="InnerJoin">
+
+<p>选择A与B中，A没有与B有交集的部分和B与A没有交集的部分  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">-- OUTER EXCLUDING JOIN</span><br><span class="line">SELECT A.PK AS A_PK, A.Value AS A_Value,</span><br><span class="line">B.Value AS B_Value, B.PK AS B_PK</span><br><span class="line">FROM Table_A A</span><br><span class="line">FULL OUTER JOIN Table_B B</span><br><span class="line">ON A.PK &#x3D; B.PK</span><br><span class="line">WHERE A.PK IS NULL</span><br><span class="line">OR B.PK IS NULL</span><br><span class="line"></span><br><span class="line">A_PK A_Value    B_Value    B_PK</span><br><span class="line">---- ---------- ---------- ----</span><br><span class="line">NULL NULL       MICROSOFT     8</span><br><span class="line">NULL NULL       APPLE         9</span><br><span class="line">NULL NULL       SCOTCH       11</span><br><span class="line">   5 ARIZONA    NULL       NULL</span><br><span class="line">   4 LINCOLN    NULL       NULL</span><br><span class="line">  10 LUCENT     NULL       NULL</span><br><span class="line"></span><br><span class="line">(6 row(s) affected)</span><br></pre></td></tr></table></div></figure>
+
+
+        <h1 id="视图与子查询"   >
+          <a href="#视图与子查询" class="heading-link"><i class="fas fa-link"></i></a>视图与子查询</h1>
+      
+        <h2 id="视图"   >
+          <a href="#视图" class="heading-link"><i class="fas fa-link"></i></a>视图</h2>
+      <p>视图并不是用来保存数据的，而是通过保存读取数据的SELECT 语句的方法来为用户提供便利的工具。  </p>
+<p>究竟视图是什么呢？如果用一句话概述的话，就是“从SQL 的角度来看视图就是一张表”。实际上，在SQL 语句中并不需要区分哪些是表，哪些是视图。<br>视图和表的差别：区别只有一个，那就是“是否保存了实际的数据”。<br>但是使用视图时并不会将数据保存到存储设备之中，而且也不会将数据保存到其他任何地方。实际上视图保存的是SELECT 语句（图5-1）。我们从视图中读取数据时，视图会在内部执行该SELECT 语句并创建出一张临时表。</p>
+<p>视图是需要通过create view 的语法来创建的，本质也是满足一定条件的数据的集合。</p>
+
+        <h3 id="限制"   >
+          <a href="#限制" class="heading-link"><i class="fas fa-link"></i></a>限制</h3>
+      <ol>
+<li>视图不可以与Group By 同时使用（可能某些DB会不支持）</li>
+</ol>
+
+        <h2 id="子查询"   >
+          <a href="#子查询" class="heading-link"><i class="fas fa-link"></i></a>子查询</h2>
+      <p>基础定义：子查询就是一次性的视图（SELECT语句）。与视图不同，子查询在SELECT语句执行完毕之后就会消失。  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select col_1 from (select col2_ from j  where $cond 1) p where $cond2</span><br><span class="line"></span><br><span class="line">其中</span><br><span class="line">p为子查询，内容为select col2_ from j  where $cond 1 满足这个条件的 j 表数据创建出来的新临时表</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="标量子查询"   >
+          <a href="#标量子查询" class="heading-link"><i class="fas fa-link"></i></a>标量子查询</h3>
+      <p>而标量子查询则有一个特殊的限制，那就是必须而且只能返回1 行1列的结果。也就是返回表中某一行的某一列的值。<br>由于返回的是单一的值，因此标量子查询的返回值可以用在= 或者&lt;&gt; 这样需要单一值的比较运算符之中。  </p>
+
+        <h4 id="标量子查询的书写位置"   >
+          <a href="#标量子查询的书写位置" class="heading-link"><i class="fas fa-link"></i></a>标量子查询的书写位置</h4>
+      <p>可以再任意位置： SELECT 子句、GROUP BY 子句、HAVING 子句，还是ORDERBY 子句，几乎所有的地方都可以使用。  </p>
+
+        <h1 id="基本语法"   >
+          <a href="#基本语法" class="heading-link"><i class="fas fa-link"></i></a>基本语法</h1>
+      
+        <h2 id="select"   >
+          <a href="#select" class="heading-link"><i class="fas fa-link"></i></a>select</h2>
+      <p>基础的选择操作</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select col1, col2, col..... from table1... where $cond</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="Select-中-引用别名列"   >
+          <a href="#Select-中-引用别名列" class="heading-link"><i class="fas fa-link"></i></a>Select 中 引用别名列</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from (select sal as salary, comm as commission from emp) x where salary &lt; 5000</span><br></pre></td></tr></table></div></figure>
+<p>上面的这种方法可以处理类似的情况：  </p>
+<ol>
+<li>聚合函数(Sum()、Min()、Max())</li>
+<li>标量子查询</li>
+<li>窗口函数</li>
+<li>别名</li>
+</ol>
+<p>将含有别名列的查询放入内嵌视图，就可以在外层查询中引用别名列。为什么要这么做<br>呢？ WHERE 子句会比SELECT 子句先执行，就最初那个失败的查询例子而言，当WHERE 子句<br>被执行时，SALARY 和COMMISSION 尚不存在。直到WHERE 子句执行完毕，那些别名列才会生<br>效。然而，FROM 子句会先于WHERE 子句执行。如果把最初的那个查询放入一个FROM 子句，<br>其查询结果会在最外层的WHERE 子句开始之前产生，这样一来，最外层的WHERE 子句就能<br>“看见”别名列了。当表里的某些列没有被恰当命名的时候，这个技巧尤其有用。  </p>
+
+        <h3 id="使用条件逻辑"   >
+          <a href="#使用条件逻辑" class="heading-link"><i class="fas fa-link"></i></a>使用条件逻辑</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select col1 , col2 ,</span><br><span class="line">       case when col2 &lt;&#x3D; 2000 then &quot;UnderPAID&quot;</span><br><span class="line">            when col2 &gt; 4000 then &quot;OVERPAID&quot;</span><br><span class="line">        end as status</span><br><span class="line">    from emp </span><br></pre></td></tr></table></div></figure>
+<p>输出的列为[col1, status]  </p>
+
+        <h3 id="限制返回条数"   >
+          <a href="#限制返回条数" class="heading-link"><i class="fas fa-link"></i></a>限制返回条数</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from emp limit 1</span><br></pre></td></tr></table></div></figure>
+<p>随机返回固定条数</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from emp order by rand() limit 5 </span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="Null的判断"   >
+          <a href="#Null的判断" class="heading-link"><i class="fas fa-link"></i></a>Null的判断</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;  判断col1 是否为空</span><br><span class="line">select * from emp where col1 is null</span><br><span class="line">&#x2F;&#x2F;  判断col2 是否不为空</span><br><span class="line">select * from emp where col2 is not null</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="Union"   >
+          <a href="#Union" class="heading-link"><i class="fas fa-link"></i></a>Union</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select deptno from emp </span><br><span class="line">union </span><br><span class="line">select deptno from dept </span><br></pre></td></tr></table></div></figure>
+
+<p>如果Union想获取到重复的条目，则应该使用union all   </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 如果使用union all 的等价实现</span><br><span class="line">select distinct deptno from</span><br><span class="line">(select deptno from emp </span><br><span class="line">union all </span><br><span class="line">select deptno from dept )</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="对于多表Join查询"   >
+          <a href="#对于多表Join查询" class="heading-link"><i class="fas fa-link"></i></a>对于多表Join查询</h3>
+      
+        <h4 id="合并相关的行"   >
+          <a href="#合并相关的行" class="heading-link"><i class="fas fa-link"></i></a>合并相关的行</h4>
+      <p>目的：对一个共同的列或者具有相同值的列做连接查询，返回多个表中的行。</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select e.name, d.loc from emp e , dept d </span><br><span class="line">where e.deptno &#x3D; 10 and e.deptno &#x3D; d.deptno</span><br></pre></td></tr></table></div></figure>
+<p>这个解决方案是一个关于连接查询的例子。更准确地说，它是内连接中的相等连接。连接<br>查询是一种把来自两个表的行合并起来的操作。对于相等连接而言，其连接条件依赖于某<br>个相等条件（例如，一个表的部门编号和另一个表的部门编号相等）。内连接是最早的一<br>种连接，它返回的每一行都包含了来自参与连接查询的各个表的数据。</p>
+<p>理论上，连接操作首先会依据FROM 子句里列出的表生成笛卡儿积（列出所有可能的行组<br>合），如下所示。</p>
+<!-- ![Union1](/assets/img/posts/sqlPost/Union-1.png) -->
+<img src="/2019/09/10/sql-revise/Union-1.png" class="" title="Union1">
+<p>EMP 表里部门编号为10 的全部员工与DEPT 表的所有部门组合都被列出来了。然后，通过<br>WHERE 子句里的e.deptno 和d.deptno 做连接操作，限定了只有EMP.DEPTNO 和DEPT.DEPTNO<br>相等的行才会被返回。</p>
+<!-- ![Union2](/assets/img/posts/sqlPost/Union-2.png) -->
+<img src="/2019/09/10/sql-revise/Union-2.png" class="" title="Union2">
+
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">类似实现，使用显式的Join来实现</span><br><span class="line">select e.name, d.loc from emp e  </span><br><span class="line">   inner join  dept d on e.deptno &#x3D; d.deptno</span><br><span class="line">   where e.deptno &#x3D; 10 </span><br></pre></td></tr></table></div></figure>
+<p>如果把上面的变成小于等于10的情况,用Join的方式合并的话会变成这样</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select e.name, d.loc from emp e  </span><br><span class="line">   inner join  dept d on e.deptno &#x3D; d.deptno</span><br><span class="line">   where (e.deptno &#x3D; 10) or (e.deptno &lt; 10)</span><br></pre></td></tr></table></div></figure>
+
+        <h4 id="查找两个表相同的行并且连接多列"   >
+          <a href="#查找两个表相同的行并且连接多列" class="heading-link"><i class="fas fa-link"></i></a>查找两个表相同的行并且连接多列</h4>
+      <p>需求： 获取Clerk的信息，但是需要全部的列  </p>
+<p>步骤： 1. 创建一个视图把Clerk的信息查出来<br>       2. 然后再去与emp表做Join获取完整的信息  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select e.empno, e.name, e.job, e.sal, e.deptno from emp e, </span><br><span class="line">(select ename, job, sal from emp where job &#x3D; &quot;CLERK&quot;) V </span><br><span class="line">where V.ename &#x3D; e.ename and </span><br><span class="line">      V.job &#x3D; e.job and </span><br><span class="line">      V.sal &#x3D; e.sal</span><br></pre></td></tr></table></div></figure>
+<p>Join的处理手法  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select e.empno, e.name, e.job, e.sal, e.deptno from emp e</span><br><span class="line">join (select ename, job, sal from emp where job &#x3D; &quot;CLERK&quot;) V on (</span><br><span class="line">    V.ename &#x3D; e.ename</span><br><span class="line">    V.job &#x3D; e.job</span><br><span class="line">    V.sal &#x3D; e.sal)</span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="查询只存在于一个表中的数据"   >
+          <a href="#查询只存在于一个表中的数据" class="heading-link"><i class="fas fa-link"></i></a>查询只存在于一个表中的数据</h4>
+      <p>一般来说，直接使用not in 就可以了。但是对于如果含有Null的数据，就不能直接使用这样的方法处理。<br>那为什么null的数据就会出现问题呢？这个就要看一下他可能的实现方式<br>对于Mysql的实现， not in 和 in  本质上是  or的关系运算。 由于null 参与Or的逻辑运算方式不一致，In 和Not in 将产生不同的结果。  </p>
+<p>此处默认表中有一条Null的数据</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; In</span><br><span class="line">select deptno from dept where deptno in (10, 50, null)</span><br><span class="line">~~~~~~~~~~</span><br><span class="line">Deptno</span><br><span class="line">--------</span><br><span class="line">10</span><br><span class="line"></span><br><span class="line">select deptno from dept where (deptno&#x3D;10 or deptno&#x3D;50 or deptno&#x3D;null)</span><br><span class="line">~~~~~~~~~~</span><br><span class="line">Deptno</span><br><span class="line">--------</span><br><span class="line">10</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;Not in </span><br><span class="line"></span><br><span class="line">select deptno from dept where deptno not in (10, 50, null)</span><br><span class="line">~~~~~~~~~~</span><br><span class="line">Deptno</span><br><span class="line">--------</span><br><span class="line">no rows</span><br><span class="line"></span><br><span class="line">select deptno from dept where deptno not  (deptno&#x3D;10 or deptno&#x3D;50 or deptno&#x3D;null)</span><br><span class="line">~~~~~~~~~~</span><br><span class="line">Deptno</span><br><span class="line">--------</span><br><span class="line">no rows</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+<p>如果想要解决上面的null 所导致的问题， 需要结合Not exists 和关联子查询。 </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">select d.deptno from dept d where</span><br><span class="line">not exists (select null from emp e where d.deptno &#x3D; e.deptno)</span><br><span class="line">~~~~~~~~~</span><br><span class="line">Deptno</span><br><span class="line">--------</span><br><span class="line">40</span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="确定两个表是否有相同的数据"   >
+          <a href="#确定两个表是否有相同的数据" class="heading-link"><i class="fas fa-link"></i></a>确定两个表是否有相同的数据</h4>
+      <!-- ![Union3](/assets/img/posts/sqlPost/Union-3.png) -->
+<p>对于上面这种查询，可能会出现红色圈的数据重复的现象。那么我们要怎样才能确定是否有重复数据呢？  </p>
+<img src="/2019/09/10/sql-revise/Union-3.png" class="" title="Union3">
+
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">create view v as </span><br><span class="line">select * from emp where deptno !&#x3D; 10</span><br><span class="line">union all </span><br><span class="line">select * from emp where ename &#x3D; &quot;ward&quot;</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+<p>处理手法使用关联子查询和UNION ALL 找出那些存在于视图V 而不存在于EMP 表的数据，以及存在于EMP 表而不存在于视图V 的数据，并将它们合并起来。  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;  处理存在于EMP 不存于v的查询</span><br><span class="line">select * from (</span><br><span class="line">   select e.empno, e.ename, e.job, e.mgr, e.hiredate,</span><br><span class="line">          e.sal, e.comm, e.deptno, count(*) as cnt from emp e</span><br><span class="line">          group by empno, ename, job, mgr, hiredate,</span><br><span class="line">                   sal, comm, deptno) e </span><br><span class="line">) where not exists (</span><br><span class="line">   select null from (</span><br><span class="line">      select v.empno, v.ename, v.job, v.mgr, v.hiredate,</span><br><span class="line">          v.sal, v.comm, v.deptno, count(*) as cnt from v</span><br><span class="line">          group by empno, ename, job, mgr, hiredate,</span><br><span class="line">                   sal, comm, deptno) v</span><br><span class="line">      where v.empno &#x3D; e.empno and </span><br><span class="line">            v.ename &#x3D; e.ename and</span><br><span class="line">            v.job &#x3D; e.job and</span><br><span class="line">            v.mgr &#x3D; e.mgr and</span><br><span class="line">            v.hiredate &#x3D; e.hiredate and</span><br><span class="line">            v.sal &#x3D; e.sal and</span><br><span class="line">            v.deptno &#x3D; e.deptno and</span><br><span class="line">            v.cnt &#x3D; e.cnt and </span><br><span class="line">            coalesce(v.comm, 0) &#x3D; coalesce(e.comm, 0)</span><br><span class="line">   )  </span><br><span class="line">)</span><br></pre></td></tr></table></div></figure>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;  处理存在于V 不存于EMP的查询</span><br><span class="line">select * from (</span><br><span class="line">   select v.empno, v.ename, v.job, v.mgr, v.hiredate,</span><br><span class="line">          v.sal, v.comm, v.deptno, count(*) as cnt from v</span><br><span class="line">          group by empno, ename, job, mgr, hiredate,</span><br><span class="line">                   sal, comm, deptno) v</span><br><span class="line">) where not exists (</span><br><span class="line">   select null from (</span><br><span class="line">      select e.empno, e.ename, e.job, e.mgr, e.hiredate,</span><br><span class="line">          e.sal, e.comm, e.deptno, count(*) as cnt from v</span><br><span class="line">          group by empno, ename, job, mgr, hiredate,</span><br><span class="line">                   sal, comm, deptno) e</span><br><span class="line">      where v.empno &#x3D; e.empno and </span><br><span class="line">            v.ename &#x3D; e.ename and</span><br><span class="line">            v.job &#x3D; e.job and</span><br><span class="line">            v.mgr &#x3D; e.mgr and</span><br><span class="line">            v.hiredate &#x3D; e.hiredate and</span><br><span class="line">            v.sal &#x3D; e.sal and</span><br><span class="line">            v.deptno &#x3D; e.deptno and</span><br><span class="line">            v.cnt &#x3D; e.cnt and </span><br><span class="line">            coalesce(v.comm, 0) &#x3D; coalesce(e.comm, 0)</span><br><span class="line">   )  </span><br><span class="line">)</span><br></pre></td></tr></table></div></figure>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 总体</span><br><span class="line">select * from (</span><br><span class="line">   select e.empno, e.ename, e.job, e.mgr, e.hiredate,</span><br><span class="line">          e.sal, e.comm, e.deptno, count(*) as cnt from emp e</span><br><span class="line">          group by empno, ename, job, mgr, hiredate,</span><br><span class="line">                   sal, comm, deptno) e </span><br><span class="line">) where not exists (</span><br><span class="line">   select null from (</span><br><span class="line">      select v.empno, v.ename, v.job, v.mgr, v.hiredate,</span><br><span class="line">          v.sal, v.comm, v.deptno, count(*) as cnt from v</span><br><span class="line">          group by empno, ename, job, mgr, hiredate,</span><br><span class="line">                   sal, comm, deptno) v</span><br><span class="line">      where v.empno &#x3D; e.empno and </span><br><span class="line">            v.ename &#x3D; e.ename and</span><br><span class="line">            v.job &#x3D; e.job and</span><br><span class="line">            v.mgr &#x3D; e.mgr and</span><br><span class="line">            v.hiredate &#x3D; e.hiredate and</span><br><span class="line">            v.sal &#x3D; e.sal and</span><br><span class="line">            v.deptno &#x3D; e.deptno and</span><br><span class="line">            v.cnt &#x3D; e.cnt and </span><br><span class="line">            coalesce(v.comm, 0) &#x3D; coalesce(e.comm, 0)</span><br><span class="line">   )  </span><br><span class="line">)</span><br><span class="line">Unoin all</span><br><span class="line">select * from (</span><br><span class="line">   select v.empno, v.ename, v.job, v.mgr, v.hiredate,</span><br><span class="line">          v.sal, v.comm, v.deptno, count(*) as cnt from v</span><br><span class="line">          group by empno, ename, job, mgr, hiredate,</span><br><span class="line">                   sal, comm, deptno) v</span><br><span class="line">) where not exists (</span><br><span class="line">   select null from (</span><br><span class="line">      select e.empno, e.ename, e.job, e.mgr, e.hiredate,</span><br><span class="line">          e.sal, e.comm, e.deptno, count(*) as cnt from v</span><br><span class="line">          group by empno, ename, job, mgr, hiredate,</span><br><span class="line">                   sal, comm, deptno) e</span><br><span class="line">      where v.empno &#x3D; e.empno and </span><br><span class="line">            v.ename &#x3D; e.ename and</span><br><span class="line">            v.job &#x3D; e.job and</span><br><span class="line">            v.mgr &#x3D; e.mgr and</span><br><span class="line">            v.hiredate &#x3D; e.hiredate and</span><br><span class="line">            v.sal &#x3D; e.sal and</span><br><span class="line">            v.deptno &#x3D; e.deptno and</span><br><span class="line">            v.cnt &#x3D; e.cnt and </span><br><span class="line">            coalesce(v.comm, 0) &#x3D; coalesce(e.comm, 0)</span><br><span class="line">   )  </span><br><span class="line">)</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="高级应用"   >
+          <a href="#高级应用" class="heading-link"><i class="fas fa-link"></i></a>高级应用</h3>
+      
+        <h4 id="分页"   >
+          <a href="#分页" class="heading-link"><i class="fas fa-link"></i></a>分页</h4>
+      <p>可以使用Mysql 或者PG 内置的 limit 和 offset 进行处理 </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select sal from emp order by sal limit 5 offset 0</span><br><span class="line"></span><br><span class="line">select sal from emp order by sal limit 5 offset 5 </span><br></pre></td></tr></table></div></figure>
+
+        <h4 id="间隔获取记录"   >
+          <a href="#间隔获取记录" class="heading-link"><i class="fas fa-link"></i></a>间隔获取记录</h4>
+      <p>对于没有默认编号的数据，我们需要先编号再进行过滤的操作<br>如果默认是已经有字段是序号的话，则采用直接Mod数据即可</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">select x.name from (</span><br><span class="line">   select a.ename , (</span><br><span class="line">      select count(*) from emp b where</span><br><span class="line">      b.ename &lt;&#x3D; a.ename</span><br><span class="line">   ) as rn from emp a </span><br><span class="line">) x where mod(rn,2) &#x3D; 1</span><br></pre></td></tr></table></div></figure>
+
+        <h4 id="外查询使用OR逻辑"   >
+          <a href="#外查询使用OR逻辑" class="heading-link"><i class="fas fa-link"></i></a>外查询使用OR逻辑</h4>
+      <ol>
+<li>先去Join表，然后再去进行Or的逻辑判断<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select e.ename, d.deptno , d.dname, d.loc from dept d </span><br><span class="line">left join emp e on (d.deptno &#x3D; e.deptno</span><br><span class="line">                    and (e.deptno&#x3D;10 or e.deptno&#x3D;20))</span><br><span class="line">order by 2 </span><br></pre></td></tr></table></div></figure></li>
+<li>先创建一个中间表，然后再去进行Join的操作</li>
+</ol>
+<p>select e.ename, d.deptno , d.dname, d.loc from dept d<br>left join (select * from emp e where e.deptno=10 or e.deptno=20)<br>on d.deptno = e.deptno order by 2 </p>
+
+        <h4 id="对单表需要做数据运算情况"   >
+          <a href="#对单表需要做数据运算情况" class="heading-link"><i class="fas fa-link"></i></a>对单表需要做数据运算情况</h4>
+      <p>情况1： 找出互逆的记录（本例）<br>情况2： 查找表中某列1相差为1，并且某列2差为5的记录  </p>
+<p>总体的思路，把自己与自己(或者与自己的子集)求笛卡尔积，然后去进行条件的筛选</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select distinct v1.* from V v1, V v2 where</span><br><span class="line">        v1.test1 &#x3D; v2.test2</span><br><span class="line">        and v1.test2 &#x3D; v2.test1</span><br><span class="line">        and v1.test1 &lt;&#x3D; v1.test2</span><br></pre></td></tr></table></div></figure>
+
+        <h4 id="找出最靠前的N条记录"   >
+          <a href="#找出最靠前的N条记录" class="heading-link"><i class="fas fa-link"></i></a>找出最靠前的N条记录</h4>
+      <p>此处使用了标量子查询来创建了一张临时表的RNK的列</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; </span><br><span class="line">select ename, sal from (</span><br><span class="line">   select (</span><br><span class="line">      select (count(distinct b.sal) from emp b where </span><br><span class="line">             a.sal &lt;&#x3D; b.sal) as rnk,</span><br><span class="line">             a.sal,</span><br><span class="line">             a.ename</span><br><span class="line">   ) from emp a </span><br><span class="line">) where rnk &lt;&#x3D;5</span><br></pre></td></tr></table></div></figure>
+
+
+
+        <h2 id="OrderBy"   >
+          <a href="#OrderBy" class="heading-link"><i class="fas fa-link"></i></a>OrderBy</h2>
+      
+        <h3 id="基础查询"   >
+          <a href="#基础查询" class="heading-link"><i class="fas fa-link"></i></a>基础查询</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 升序查询</span><br><span class="line">select * from emp order by col2 asc;</span><br><span class="line">&#x2F;&#x2F; 降序查询</span><br><span class="line">select * from emp order by col2 desc;</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="多字段排序"   >
+          <a href="#多字段排序" class="heading-link"><i class="fas fa-link"></i></a>多字段排序</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select empno, deptno, sal, ename, job from emp order by deptno (asc), sal desc;</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="动态排序"   >
+          <a href="#动态排序" class="heading-link"><i class="fas fa-link"></i></a>动态排序</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select ename, sal, job, comm from emp order by </span><br><span class="line">       case when job &#x3D; &quot;salesman&quot; then comm</span><br><span class="line">            else  sal </span><br><span class="line">       end;</span><br></pre></td></tr></table></div></figure>
+
+
+        <h2 id="update"   >
+          <a href="#update" class="heading-link"><i class="fas fa-link"></i></a>update</h2>
+      
+        <h3 id="基础语法"   >
+          <a href="#基础语法" class="heading-link"><i class="fas fa-link"></i></a>基础语法</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update table name set col_name &#x3D; xxx where $cond</span><br></pre></td></tr></table></div></figure>
+
+        <h2 id="delete"   >
+          <a href="#delete" class="heading-link"><i class="fas fa-link"></i></a>delete</h2>
+      <p>基础语法  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">delete from table_name where $cond</span><br></pre></td></tr></table></div></figure>
+<p>删除重复记录</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">delete from table where id not in (select min(id) from table group by name)</span><br></pre></td></tr></table></div></figure>
+
+        <h1 id="Having-amp-GroupBy"   >
+          <a href="#Having-amp-GroupBy" class="heading-link"><i class="fas fa-link"></i></a>Having &amp; GroupBy</h1>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wiki原文</span><br><span class="line">A HAVING clause in SQL specifies that an SQL SELECT statement should only return rows where aggregate values meet the specified conditions. It was added to the SQL language because the WHERE keyword could not be used with aggregate functions.</span><br><span class="line">The HAVING clause filters the data on the group row but not on the individual row.</span><br><span class="line">To view the present condition formed by the GROUP BY clause, the HAVING clause is used.</span><br></pre></td></tr></table></div></figure>
+<p>Having的语句是必须要在GroupBy后面才能使用。并且与Where的区别是，Where不能直接接入聚合的函数（如Sum()、Count()、Avg()） 这种的聚合函数， 意思是不能 where sum(column_a) 这样的用法）, 并且Having可以对按Group区分的Row进行过滤的操作</p>
+<p>所以常规语法一般是</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_a A group by columa_a having count (A.column_a ) &gt; 200</span><br></pre></td></tr></table></div></figure>
+
+        <h1 id="特殊注意"   >
+          <a href="#特殊注意" class="heading-link"><i class="fas fa-link"></i></a>特殊注意</h1>
+      <ol>
+<li>类似于Sum， max， min , avg 这些也是可以直接用于select 的条件上面的<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select max(Salary) as SecondHighestSalary from employee where salary&lt;(select max(distinct(salary)) from employee)</span><br></pre></td></tr></table></div></figure></li>
+<li>sql 三元运算符<br>if (expr1, expr2, expr3)<br>跟正常编程语言中的三元运算符一致，只是语法有变动。也是满足条件一，则返回expr2，否则返回expr3</li>
+</ol>
+
+        <h1 id="ShareNote"   >
+          <a href="#ShareNote" class="heading-link"><i class="fas fa-link"></i></a>ShareNote</h1>
+      <ol>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://www.codeproject.com/Articles/33052/Visual-Representation-of-SQL-Joins" >Visual-Representation-of-SQL</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Having_(SQL)" >Having-Sql-Cluse-wiki</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://book.douban.com/subject/30259463/" >Sql经典实例</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+<li><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://www.ituring.com.cn/book/miniarticle/47448" >Sql基础教程</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></li>
+</ol>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="http://example.com">Ray Chen</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="http://example.com/2019/09/10/sql-revise/">http://example.com/2019/09/10/sql-revise/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="http://example.com/tags/SQL/">SQL</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2019/09/16/effective-go/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">Effective Go Reading</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2019/09/03/go-slice/"><span class="paginator-prev__text">Go语言切片技巧</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95"><span class="toc-number">1.</span> <span class="toc-text">
+          目录</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%9B%AE%E7%9A%84"><span class="toc-number">2.</span> <span class="toc-text">
+          目的</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Join"><span class="toc-number">3.</span> <span class="toc-text">
+          Join</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A4%E5%A4%84%E6%89%80%E6%8F%90%E5%8F%8A%E7%9A%84%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E5%92%8C%E8%A1%A8%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.1.</span> <span class="toc-text">
+          此处所提及的表的数据和表类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E6%9C%ACJoin%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.2.</span> <span class="toc-text">
+          基本Join类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#InnerJoin"><span class="toc-number">3.2.1.</span> <span class="toc-text">
+          InnerJoin</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LeftJoin"><span class="toc-number">3.2.2.</span> <span class="toc-text">
+          LeftJoin</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RightJoin"><span class="toc-number">3.2.3.</span> <span class="toc-text">
+          RightJoin</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OuterJoin"><span class="toc-number">3.2.4.</span> <span class="toc-text">
+          OuterJoin</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AB%98%E7%BA%A7Join%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.3.</span> <span class="toc-text">
+          高级Join类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#LEFT-JOIN-EXCLUDING-INNER-JOIN"><span class="toc-number">3.3.1.</span> <span class="toc-text">
+          LEFT JOIN EXCLUDING INNER JOIN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RIGHT-JOIN-EXCLUDING-INNER-JOIN"><span class="toc-number">3.3.2.</span> <span class="toc-text">
+          RIGHT JOIN EXCLUDING INNER JOIN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OUTER-JOIN-EXCLUDING-INNER-JOIN"><span class="toc-number">3.3.3.</span> <span class="toc-text">
+          OUTER JOIN EXCLUDING INNER JOIN</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%86%E5%9B%BE%E4%B8%8E%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="toc-number">4.</span> <span class="toc-text">
+          视图与子查询</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%86%E5%9B%BE"><span class="toc-number">4.1.</span> <span class="toc-text">
+          视图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%99%90%E5%88%B6"><span class="toc-number">4.1.1.</span> <span class="toc-text">
+          限制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="toc-number">4.2.</span> <span class="toc-text">
+          子查询</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%87%E9%87%8F%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="toc-number">4.2.1.</span> <span class="toc-text">
+          标量子查询</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%87%E9%87%8F%E5%AD%90%E6%9F%A5%E8%AF%A2%E7%9A%84%E4%B9%A6%E5%86%99%E4%BD%8D%E7%BD%AE"><span class="toc-number">4.2.1.1.</span> <span class="toc-text">
+          标量子查询的书写位置</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95"><span class="toc-number">5.</span> <span class="toc-text">
+          基本语法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#select"><span class="toc-number">5.1.</span> <span class="toc-text">
+          select</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Select-%E4%B8%AD-%E5%BC%95%E7%94%A8%E5%88%AB%E5%90%8D%E5%88%97"><span class="toc-number">5.1.1.</span> <span class="toc-text">
+          Select 中 引用别名列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%9D%A1%E4%BB%B6%E9%80%BB%E8%BE%91"><span class="toc-number">5.1.2.</span> <span class="toc-text">
+          使用条件逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%99%90%E5%88%B6%E8%BF%94%E5%9B%9E%E6%9D%A1%E6%95%B0"><span class="toc-number">5.1.3.</span> <span class="toc-text">
+          限制返回条数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Null%E7%9A%84%E5%88%A4%E6%96%AD"><span class="toc-number">5.1.4.</span> <span class="toc-text">
+          Null的判断</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Union"><span class="toc-number">5.1.5.</span> <span class="toc-text">
+          Union</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E4%BA%8E%E5%A4%9A%E8%A1%A8Join%E6%9F%A5%E8%AF%A2"><span class="toc-number">5.1.6.</span> <span class="toc-text">
+          对于多表Join查询</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%88%E5%B9%B6%E7%9B%B8%E5%85%B3%E7%9A%84%E8%A1%8C"><span class="toc-number">5.1.6.1.</span> <span class="toc-text">
+          合并相关的行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E4%B8%A4%E4%B8%AA%E8%A1%A8%E7%9B%B8%E5%90%8C%E7%9A%84%E8%A1%8C%E5%B9%B6%E4%B8%94%E8%BF%9E%E6%8E%A5%E5%A4%9A%E5%88%97"><span class="toc-number">5.1.6.2.</span> <span class="toc-text">
+          查找两个表相同的行并且连接多列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E5%8F%AA%E5%AD%98%E5%9C%A8%E4%BA%8E%E4%B8%80%E4%B8%AA%E8%A1%A8%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="toc-number">5.1.6.3.</span> <span class="toc-text">
+          查询只存在于一个表中的数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A1%AE%E5%AE%9A%E4%B8%A4%E4%B8%AA%E8%A1%A8%E6%98%AF%E5%90%A6%E6%9C%89%E7%9B%B8%E5%90%8C%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="toc-number">5.1.6.4.</span> <span class="toc-text">
+          确定两个表是否有相同的数据</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AB%98%E7%BA%A7%E5%BA%94%E7%94%A8"><span class="toc-number">5.1.7.</span> <span class="toc-text">
+          高级应用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E9%A1%B5"><span class="toc-number">5.1.7.1.</span> <span class="toc-text">
+          分页</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%97%B4%E9%9A%94%E8%8E%B7%E5%8F%96%E8%AE%B0%E5%BD%95"><span class="toc-number">5.1.7.2.</span> <span class="toc-text">
+          间隔获取记录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%96%E6%9F%A5%E8%AF%A2%E4%BD%BF%E7%94%A8OR%E9%80%BB%E8%BE%91"><span class="toc-number">5.1.7.3.</span> <span class="toc-text">
+          外查询使用OR逻辑</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E5%8D%95%E8%A1%A8%E9%9C%80%E8%A6%81%E5%81%9A%E6%95%B0%E6%8D%AE%E8%BF%90%E7%AE%97%E6%83%85%E5%86%B5"><span class="toc-number">5.1.7.4.</span> <span class="toc-text">
+          对单表需要做数据运算情况</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%BE%E5%87%BA%E6%9C%80%E9%9D%A0%E5%89%8D%E7%9A%84N%E6%9D%A1%E8%AE%B0%E5%BD%95"><span class="toc-number">5.1.7.5.</span> <span class="toc-text">
+          找出最靠前的N条记录</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OrderBy"><span class="toc-number">5.2.</span> <span class="toc-text">
+          OrderBy</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2"><span class="toc-number">5.2.1.</span> <span class="toc-text">
+          基础查询</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E5%AD%97%E6%AE%B5%E6%8E%92%E5%BA%8F"><span class="toc-number">5.2.2.</span> <span class="toc-text">
+          多字段排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E6%8E%92%E5%BA%8F"><span class="toc-number">5.2.3.</span> <span class="toc-text">
+          动态排序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#update"><span class="toc-number">5.3.</span> <span class="toc-text">
+          update</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95"><span class="toc-number">5.3.1.</span> <span class="toc-text">
+          基础语法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#delete"><span class="toc-number">5.4.</span> <span class="toc-text">
+          delete</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Having-amp-GroupBy"><span class="toc-number">6.</span> <span class="toc-text">
+          Having &amp; GroupBy</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E6%B3%A8%E6%84%8F"><span class="toc-number">7.</span> <span class="toc-text">
+          特殊注意</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ShareNote"><span class="toc-number">8.</span> <span class="toc-text">
+          ShareNote</span></a></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/header.jpeg" alt="avatar"></div><p class="sidebar-ov-author__text">Believe in Goods in People</p></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">13</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">0</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">5</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Ray Chen</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.3.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.6.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="/js/utils.js?v=2.6.1"></script><script src="/js/stun-boot.js?v=2.6.1"></script><script src="/js/scroll.js?v=2.6.1"></script><script src="/js/header.js?v=2.6.1"></script><script src="/js/sidebar.js?v=2.6.1"></script></body></html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.6.1" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.6.1" type="image/png" sizes="32x32"><meta name="description" content="添加元素到切片中                           添加元素到尾部       12345var a []int&#x2F;&#x2F;  添加元素(后面的元素都需要解包）append(a, 0)&#x2F;&#x2F; 添加切片(后面的元素都需要解包）append(a, []int&amp;#123;1,2,3&amp;#125;...)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go语言切片技巧">
+<meta property="og:url" content="http://example.com/2019/09/03/go-slice/index.html">
+<meta property="og:site_name" content="Ray 的藏书阁">
+<meta property="og:description" content="添加元素到切片中                           添加元素到尾部       12345var a []int&#x2F;&#x2F;  添加元素(后面的元素都需要解包）append(a, 0)&#x2F;&#x2F; 添加切片(后面的元素都需要解包）append(a, []int&amp;#123;1,2,3&amp;#125;...)">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2019/09/03/go-slice/GoSlice.png">
+<meta property="og:image" content="http://example.com/2019/09/03/go-slice/GoSliceExtend.png">
+<meta property="article:published_time" content="2019-09-03T02:07:38.000Z">
+<meta property="article:modified_time" content="2021-01-22T06:37:38.165Z">
+<meta property="article:author" content="Ray Chen">
+<meta property="article:tag" content="Go">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2019/09/03/go-slice/GoSlice.png"><title>Go语言切片技巧 | Ray 的藏书阁</title><link ref="canonical" href="http://example.com/2019/09/03/go-slice/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.6.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":false},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Ray 的藏书阁</div><div class="header-banner-info__subtitle"></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">Go语言切片技巧</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2019-09-03</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-01-22</span></span></div></header><div class="post-body"><!-- ---
+layout: post
+title: 
+author: Ray Chan(ray1888)
+date: '2019-09-03 10:07:38 +0800'
+category: go
+summary: Go Slice 
+thumbnail: go.png
+--- -->
+
+
+
+
+        <h1 id="添加元素到切片中"   >
+          <a href="#添加元素到切片中" class="heading-link"><i class="fas fa-link"></i></a>添加元素到切片中</h1>
+      
+        <h2 id="添加元素到尾部"   >
+          <a href="#添加元素到尾部" class="heading-link"><i class="fas fa-link"></i></a>添加元素到尾部</h2>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var a []int</span><br><span class="line">&#x2F;&#x2F;  添加元素(后面的元素都需要解包）</span><br><span class="line">append(a, 0)</span><br><span class="line">&#x2F;&#x2F; 添加切片(后面的元素都需要解包）</span><br><span class="line">append(a, []int&#123;1,2,3&#125;...)</span><br></pre></td></tr></table></div></figure>
+
+        <h2 id="添加元素到头部"   >
+          <a href="#添加元素到头部" class="heading-link"><i class="fas fa-link"></i></a>添加元素到头部</h2>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var a []int</span><br><span class="line">&#x2F;&#x2F;  添加元素(后面的元素都需要解包）  </span><br><span class="line">a &#x3D; append([]int&#123;1&#125;, a...)</span><br><span class="line">&#x2F;&#x2F; 添加切片(后面的元素都需要解包）  </span><br><span class="line">a &#x3D; append([]int&#123;1,2,3&#125;, a...)  </span><br></pre></td></tr></table></div></figure>
+
+        <h2 id="添加指定元素到切片中"   >
+          <a href="#添加指定元素到切片中" class="heading-link"><i class="fas fa-link"></i></a>添加指定元素到切片中</h2>
+      <p>性能较低的方法（会产生中间过渡切片）  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var a []int</span><br><span class="line">a &#x3D; append(a[:i], append([]int&#123;1,2&#125;, a[i:]...)...)  &#x2F;&#x2F; 在第i个元素插入切片</span><br><span class="line">a &#x3D; append(a[:i], append([]int&#123;1&#125;, a[i:]...)...)     &#x2F;&#x2F;  在第i个元素插入元素</span><br></pre></td></tr></table></div></figure>
+<p>性能较高的方法</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;  插入单个元素</span><br><span class="line">a &#x3D; append(a, 0)</span><br><span class="line">copy(a[i+1:],  a[i:])</span><br><span class="line">a[i] &#x3D; x </span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;  添加多个元素(一个切片）</span><br><span class="line">&#x2F;&#x2F;  b&#x3D; []int&#123;1,2,3&#125;</span><br><span class="line">a &#x3D; append(a,b..)</span><br><span class="line">copy(a[i+len(b):],  a[i:])</span><br><span class="line">copy(a[i:], b) </span><br></pre></td></tr></table></div></figure>
+
+
+        <h1 id="删除切片元素"   >
+          <a href="#删除切片元素" class="heading-link"><i class="fas fa-link"></i></a>删除切片元素</h1>
+      
+        <h2 id="删除结尾元素"   >
+          <a href="#删除结尾元素" class="heading-link"><i class="fas fa-link"></i></a>删除结尾元素</h2>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a &#x3D; []int&#123;1,2,3&#125;</span><br><span class="line">&#x2F;&#x2F; 删除单个元素</span><br><span class="line">a &#x3D; a[:len(a)-1]</span><br><span class="line">&#x2F;&#x2F; 删除多个元素</span><br><span class="line">a &#x3D; a[:len(a)-N]</span><br></pre></td></tr></table></div></figure>
+
+        <h2 id="删除开头元素"   >
+          <a href="#删除开头元素" class="heading-link"><i class="fas fa-link"></i></a>删除开头元素</h2>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a &#x3D; []int&#123;1,2,3&#125;</span><br><span class="line">&#x2F;&#x2F; 删除单个元素</span><br><span class="line">a &#x3D; a[1:]</span><br><span class="line">&#x2F;&#x2F; 删除多个元素</span><br><span class="line">a &#x3D; a[N:]</span><br></pre></td></tr></table></div></figure>
+
+<p>不移动指针的方法(把后面元素往前移动)， 用到了空指针  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">a &#x3D; []int&#123;1,2,3&#125;</span><br><span class="line">&#x2F;&#x2F; 删除单个元素</span><br><span class="line">a &#x3D; append(a[:0], a[1:]...)  </span><br><span class="line">&#x2F;&#x2F; 删除多个元素</span><br><span class="line">a &#x3D;  append(a[:0], a[N:]...)  </span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;  使用Copy来进行处理</span><br><span class="line">a &#x3D; []int&#123;1,2,3&#125;</span><br><span class="line">a &#x3D; a[:copy(a, a[1:])]</span><br><span class="line">a &#x3D; a[:copy(a, a[N:])]</span><br></pre></td></tr></table></div></figure>
+
+        <h2 id="删除中间元素"   >
+          <a href="#删除中间元素" class="heading-link"><i class="fas fa-link"></i></a>删除中间元素</h2>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">a &#x3D; []int&#123;1,2,3,4,5&#125;</span><br><span class="line">a &#x3D; append(a[:i], a[i+1:]...)</span><br><span class="line">a &#x3D; append(a[:i], a[i+N:]...)</span><br><span class="line"></span><br><span class="line">a &#x3D; a[:i+copy(a[i:], a[i+1:])]</span><br><span class="line">a &#x3D; a[:i+copy(a[i:], a[i+N:])]</span><br></pre></td></tr></table></div></figure>
+
+        <h1 id="切片的实现原理及使用的注意事项"   >
+          <a href="#切片的实现原理及使用的注意事项" class="heading-link"><i class="fas fa-link"></i></a>切片的实现原理及使用的注意事项</h1>
+      <p>切片本质上是对底层数组的一个数据的引用。但是它是一个动态的结构。它的底层结构是这样的  </p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">type SliceHeader struct&#123;</span><br><span class="line">    Data uintptr</span><br><span class="line">    Len   int  &#x2F;&#x2F;  实际已经使用的容量</span><br><span class="line">    Cap   int  &#x2F;&#x2F;  最大的容量</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+<!-- ![goSlice](/assets/img/posts/GoSlice.png) -->
+<img src="/2019/09/03/go-slice/GoSlice.png" class="" title="goSlice">
+
+
+<p>可以看出实际上这两个切片都是指向同一个数组的。但是如果当切片进行扩展后，会变成这样。  </p>
+<!-- ![goSliceE](/assets/img/posts/GoSliceExtend.png) -->
+<img src="/2019/09/03/go-slice/GoSliceExtend.png" class="" title="goSliceE">
+
+
+<p>可以看出，因为原来的底层数组因为长度已经不足以Slice进行扩展，因此Slice会先去创建一个新的底层数组，并且把原来的元素加入到新创建的数组中，并且再把新插入的元素插入到新数组中。然后把原来指向的底层数组的Reference Count 减一。  </p>
+
+        <h2 id="使用的技巧"   >
+          <a href="#使用的技巧" class="heading-link"><i class="fas fa-link"></i></a>使用的技巧</h2>
+      <ol>
+<li>因为如果append进去切片的时候，len = cap 就会出现内存的申请和数据的复制，这样会使得比较慢。使用时尽量去减少触发内存分配的次数和分配内存的大小。</li>
+<li>对于切片来说，即使是空切片，cap=0, len=0, 它实际上也不会是nil, 因此判断一个切片是否为空，应该使用len($slice_name) == 0 来继续判断。</li>
+</ol>
+
+        <h2 id="切片GC的问题"   >
+          <a href="#切片GC的问题" class="heading-link"><i class="fas fa-link"></i></a>切片GC的问题</h2>
+      <p>一个比较经常的情况，对底层数组的某一个内存的引用，导致整个数组无法被GC。</p>
+
+        <h3 id="变量引用的情况"   >
+          <a href="#变量引用的情况" class="heading-link"><i class="fas fa-link"></i></a>变量引用的情况</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">func FindPhoneNumber(filename string) []byte&#123;</span><br><span class="line">	b, _ :&#x3D; ioutil.ReadFile(filename)</span><br><span class="line">	return regexp.MustCompile(&quot;[0-9]+&quot;).Find(b)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+<p>上面的这段代码里面，因为返回的地方是一个切片引用了b的底层数组，导致b的底层数组会一直在内存中。  </p>
+<p>解决上面的问题，可以使用传值把需要用到的值传到一个新的切片里面，这样就能减少依赖。</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">func FindPhoneNumber(filename string) []byte&#123;</span><br><span class="line">	b, _ :&#x3D; ioutil.ReadFile(filename)</span><br><span class="line">	b &#x3D;  regexp.MustCompile(&quot;[0-9]+&quot;).Find(b)</span><br><span class="line">    return append([]byte&#123;&#125;, b)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+        <h3 id="删除变量的情况"   >
+          <a href="#删除变量的情况" class="heading-link"><i class="fas fa-link"></i></a>删除变量的情况</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var a *[]int&#123;1,2,3,4,4,5,6&#125;</span><br><span class="line">a &#x3D; a[:len(a)-1] &#x2F;&#x2F; 被删除的最后一个元素仍然被引用</span><br></pre></td></tr></table></div></figure>
+<p>保险的处理方法, 把需要删除的元素设置为nil，然后再去进行切片</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var a *[]int&#123;1,2,3,4,4,5,6&#125;</span><br><span class="line">a[len(a)-1] &#x3D; nil</span><br><span class="line">a &#x3D; a[:len(a)-1] &#x2F;&#x2F; 被删除的最后一个元素仍然被引用</span><br></pre></td></tr></table></div></figure></div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="http://example.com">Ray Chen</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="http://example.com/2019/09/03/go-slice/">http://example.com/2019/09/03/go-slice/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="http://example.com/tags/Go/">Go</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2019/09/10/sql-revise/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">SQL复习</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2019/08/29/raft-lab-4/"><span class="paginator-prev__text">MIT6.824 Lab4 实现及解析</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E5%85%83%E7%B4%A0%E5%88%B0%E5%88%87%E7%89%87%E4%B8%AD"><span class="toc-number">1.</span> <span class="toc-text">
+          添加元素到切片中</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E5%85%83%E7%B4%A0%E5%88%B0%E5%B0%BE%E9%83%A8"><span class="toc-number">1.1.</span> <span class="toc-text">
+          添加元素到尾部</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E5%85%83%E7%B4%A0%E5%88%B0%E5%A4%B4%E9%83%A8"><span class="toc-number">1.2.</span> <span class="toc-text">
+          添加元素到头部</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E6%8C%87%E5%AE%9A%E5%85%83%E7%B4%A0%E5%88%B0%E5%88%87%E7%89%87%E4%B8%AD"><span class="toc-number">1.3.</span> <span class="toc-text">
+          添加指定元素到切片中</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E5%88%87%E7%89%87%E5%85%83%E7%B4%A0"><span class="toc-number">2.</span> <span class="toc-text">
+          删除切片元素</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E7%BB%93%E5%B0%BE%E5%85%83%E7%B4%A0"><span class="toc-number">2.1.</span> <span class="toc-text">
+          删除结尾元素</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E5%BC%80%E5%A4%B4%E5%85%83%E7%B4%A0"><span class="toc-number">2.2.</span> <span class="toc-text">
+          删除开头元素</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E4%B8%AD%E9%97%B4%E5%85%83%E7%B4%A0"><span class="toc-number">2.3.</span> <span class="toc-text">
+          删除中间元素</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%87%E7%89%87%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">3.</span> <span class="toc-text">
+          切片的实现原理及使用的注意事项</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E7%9A%84%E6%8A%80%E5%B7%A7"><span class="toc-number">3.1.</span> <span class="toc-text">
+          使用的技巧</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%87%E7%89%87GC%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">3.2.</span> <span class="toc-text">
+          切片GC的问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%98%E9%87%8F%E5%BC%95%E7%94%A8%E7%9A%84%E6%83%85%E5%86%B5"><span class="toc-number">3.2.1.</span> <span class="toc-text">
+          变量引用的情况</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E5%8F%98%E9%87%8F%E7%9A%84%E6%83%85%E5%86%B5"><span class="toc-number">3.2.2.</span> <span class="toc-text">
+          删除变量的情况</span></a></li></ol></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/header.jpeg" alt="avatar"></div><p class="sidebar-ov-author__text">Believe in Goods in People</p></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">13</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">0</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">5</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Ray Chen</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.3.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.6.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="/js/utils.js?v=2.6.1"></script><script src="/js/stun-boot.js?v=2.6.1"></script><script src="/js/scroll.js?v=2.6.1"></script><script src="/js/header.js?v=2.6.1"></script><script src="/js/sidebar.js?v=2.6.1"></script></body></html>
