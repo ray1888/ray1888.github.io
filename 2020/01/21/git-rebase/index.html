@@ -1,0 +1,142 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.6.1" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.6.1" type="image/png" sizes="32x32"><meta name="description" content="git commit 整理小提示                           问题       发现目前代码提交的时候，有同事其实可以把debug用的commit可以与实际的改动合成一个[虽然更加建议的是用单元测试和TDD来做开发]，但是并没有这样做，导致每次的合入多合入了不少没用的Commit信息。                     引导作用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git-rebase">
+<meta property="og:url" content="http://example.com/2020/01/21/git-rebase/index.html">
+<meta property="og:site_name" content="Ray 的藏书阁">
+<meta property="og:description" content="git commit 整理小提示                           问题       发现目前代码提交的时候，有同事其实可以把debug用的commit可以与实际的改动合成一个[虽然更加建议的是用单元测试和TDD来做开发]，但是并没有这样做，导致每次的合入多合入了不少没用的Commit信息。                     引导作用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic1.png">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic2.png">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic3.png">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic4.png">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic5.png">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic6.png">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic7.png">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic8.png">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic9.png">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic10.png">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic11.png">
+<meta property="og:image" content="http://example.com/2020/01/21/git-rebase/pic12.png">
+<meta property="article:published_time" content="2020-01-21T06:19:22.000Z">
+<meta property="article:modified_time" content="2021-01-24T13:27:11.498Z">
+<meta property="article:author" content="Ray Chen">
+<meta property="article:tag" content="git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2020/01/21/git-rebase/pic1.png"><title>git-rebase | Ray 的藏书阁</title><link ref="canonical" href="http://example.com/2020/01/21/git-rebase/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.6.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":false},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Ray 的藏书阁</div><div class="header-banner-info__subtitle"></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">git-rebase</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2020-01-21</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-01-24</span></span></div></header><div class="post-body">
+        <h1 id="git-commit-整理小提示"   >
+          <a href="#git-commit-整理小提示" class="heading-link"><i class="fas fa-link"></i></a>git commit 整理小提示</h1>
+      
+        <h3 id="问题"   >
+          <a href="#问题" class="heading-link"><i class="fas fa-link"></i></a>问题</h3>
+      <p>发现目前代码提交的时候，有同事其实可以把debug用的commit可以与实际的改动合成一个[虽然更加建议的是用单元测试和TDD来做开发]，但是并没有这样做，导致每次的合入多合入了不少没用的Commit信息。</p>
+
+        <h3 id="引导作用"   >
+          <a href="#引导作用" class="heading-link"><i class="fas fa-link"></i></a>引导作用</h3>
+      <p>希望可以通过这篇小分享可以达到把Git commit log与历史操作的意图能映射起来，能够快速找出可能当时修改的需求是什么，或者方便找出大概是哪些commit修改过哪部分的模块，达到快速定位，而不用全部靠经验来去问，减少沟通成本的开销</p>
+
+        <h3 id="使用工具"   >
+          <a href="#使用工具" class="heading-link"><i class="fas fa-link"></i></a>使用工具</h3>
+      <p>git rebase -i $branch_name</p>
+<p>branch_name是需要rebase到的分支，可以理解为提交MR的Target分支即可</p>
+
+        <h3 id="操作例子"   >
+          <a href="#操作例子" class="heading-link"><i class="fas fa-link"></i></a>操作例子</h3>
+      <p>下面会以简单的场景作为例子来展示</p>
+<!-- ![image.png](https://cdn.nlark.com/yuque/0/2020/png/554199/1579588371776-631d0113-f187-4d90-9e95-aa0fcd632b25.png#align=left&display=inline&height=151&name=image.png&originHeight=302&originWidth=685&size=28554&status=done&style=none&width=342.5) -->
+<img src="/2020/01/21/git-rebase/pic1.png" class="" title="图1">
+
+<p>上图中有三个commit，本质上是对同一个功能进行修改。但是实际上只有最后一个Commit是有意义的，因此我们的目的是通过改写commit把三个commit的commitlog合成一个，并且保存三个commit的改动的代码。</p>
+<p>执行命令后会弹出下图界面</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rebase -i develop</span><br></pre></td></tr></table></div></figure>
+<!-- ![image.png](https://cdn.nlark.com/yuque/0/2020/png/554199/1579588597962-54bb7d78-3229-499d-9848-865a9834097b.png#align=left&display=inline&height=206&name=image.png&originHeight=412&originWidth=699&size=53435&status=done&style=none&width=349.5) -->
+<img src="/2020/01/21/git-rebase/pic2.png" class="" title="图2">
+
+<p>根据我们的目的，应该把前置的东西修改成如下状态，然后用Vim的方法进行保存。</p>
+<!-- ![image.png](https://cdn.nlark.com/yuque/0/2020/png/554199/1579588679733-7d55dc8b-0cf9-4a97-b3a6-3f67f8bfb0d0.png#align=left&display=inline&height=206&name=image.png&originHeight=412&originWidth=699&size=53435&status=done&style=none&uid=1579588678281-0&width=349.5) -->
+<img src="/2020/01/21/git-rebase/pic3.png" class="" title="图3">
+<!-- ![image.png](https://cdn.nlark.com/yuque/0/2020/png/554199/1579588708290-1d2c2288-cadb-4238-b7ce-c021bd1ad1e3.png#align=left&display=inline&height=207&name=image.png&originHeight=415&originWidth=722&size=53502&status=done&style=none&width=361) -->
+<img src="/2020/01/21/git-rebase/pic4.png" class="" title="图4">
+<!-- ![image.png](https://cdn.nlark.com/yuque/0/2020/png/554199/1579588913048-47254f00-cbd1-472c-b620-e2d3e2eff61b.png#align=left&display=inline&height=207&name=image.png&originHeight=413&originWidth=731&size=54933&status=done&style=none&width=365.5) -->
+<img src="/2020/01/21/git-rebase/pic5.png" class="" title="图5">
+<p>（之后会对下面的状态会进行补充说明。<br>此处描述一下操作的目的，由于git的限制，第一个commit必须不能为Fixup的状态，所以我们实际上的操作要变成把第一个commit的commit log 改写，然后把后面两个的commit 保留代码修改，丢弃后两个的commit log )</p>
+<p>然后就会rebase中的状态</p>
+<!-- ![image.png](https://cdn.nlark.com/yuque/0/2020/png/554199/1579588773915-fa4b12b1-62aa-4276-bfac-af3d2b37b04e.png#align=left&display=inline&height=46&name=image.png&originHeight=92&originWidth=716&size=8185&status=done&style=none&width=358) -->
+<img src="/2020/01/21/git-rebase/pic6.png" class="" title="图6">
+
+<p>查看git status</p>
+<!-- ![image.png](https://cdn.nlark.com/yuque/0/2020/png/554199/1579589042041-2305da7f-cab6-4cc4-9046-44d792dc8b94.png#align=left&display=inline&height=142&name=image.png&originHeight=284&originWidth=739&size=35631&status=done&style=none&width=369.5) -->
+<img src="/2020/01/21/git-rebase/pic7.png" class="" title="图7">
+
+<p>我们应该使用git commit –amend来继续commit的修改</p>
+<!-- ![image.png](https://cdn.nlark.com/yuque/0/2020/png/554199/1579589129508-8831ba61-768e-4bee-9e29-c4e1dd3a52f2.png#align=left&display=inline&height=177&name=image.png&originHeight=354&originWidth=750&size=43570&status=done&style=none&width=375) -->
+<img src="/2020/01/21/git-rebase/pic8.png" class="" title="图8">
+
+<p>对其进行修改，我们把红色圈圈的部分修改为下图（实际上即把第三个commit log 的msg作为修改值），然后保存</p>
+<!-- ![image.png](https://cdn.nlark.com/yuque/0/2020/png/554199/1579589189389-93d13df5-93e6-4771-aefd-c185a388a6c8.png#align=left&display=inline&height=169&name=image.png&originHeight=338&originWidth=758&size=39336&status=done&style=none&width=379) -->
+<img src="/2020/01/21/git-rebase/pic9.png" class="" title="图9">
+
+<p>然后继续</p>
+<!-- ![image.png](https://cdn.nlark.com/yuque/0/2020/png/554199/1579589215414-8280d103-70eb-490d-b464-f11d7328bf68.png#align=left&display=inline&height=35&name=image.png&originHeight=70&originWidth=756&size=10327&status=done&style=none&width=378) -->
+<img src="/2020/01/21/git-rebase/pic10.png" class="" title="图10">
+
+<p>查看git log </p>
+<!-- ![image.png](https://cdn.nlark.com/yuque/0/2020/png/554199/1579589254771-7c813ced-058b-4fb7-aa7e-1e6c26379426.png#align=left&display=inline&height=204&name=image.png&originHeight=407&originWidth=729&size=49500&status=done&style=none&width=364.5) -->
+<img src="/2020/01/21/git-rebase/pic11.png" class="" title="图11">
+
+<p>我们成功把三个commit合成了一个commit，并且把commit log改写成了我们想要的样子</p>
+
+        <h3 id="Git-rebase-参数讲解"   >
+          <a href="#Git-rebase-参数讲解" class="heading-link"><i class="fas fa-link"></i></a>Git rebase 参数讲解</h3>
+      <!-- ![](https://cdn.nlark.com/yuque/0/2020/png/554199/1579588913048-47254f00-cbd1-472c-b620-e2d3e2eff61b.png#align=left&display=inline&height=413&originHeight=413&originWidth=731&status=done&style=none&width=731) -->
+<img src="/2020/01/21/git-rebase/pic12.png" class="" title="图12">
+
+<p>pick 代表的是直接复用commit<br>edit  使用commit，但是需要commiter手动修改commit msg <br>reword  使用commit，并且使用在此处修改后的commit msg （ 可以理解为edit + git commit –amend的连击操作）<br>squash  使用commit，并且把commit msg 直接追加到上一个commit ,如果上图中第二个改写为s，出现的最终commitlog应该为(注意生成结果是一个commit）</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">add: translation in output</span><br><span class="line">debug: add log run success</span><br></pre></td></tr></table></div></figure>
+<p>fixup  使用commit，并且丢弃其commit msg ，保留代码的变动<br>exec  执行其他的shell命令<br>break 可以理解为打断点，就如果对某个commit的改动不太确定可以通过break停在某个commit上，使用–continue即可继续rebase的流程<br>drop  丢弃commit<br>label  对此commit打标签<br>reset  把head重置到此，这里的reset 是软reset，即此commit后的修改都会保留到git 工作区中，不会消失<br>merge 直接merge其他的分支或者commit</p>
+
+        <h3 id="操作流程整理"   >
+          <a href="#操作流程整理" class="heading-link"><i class="fas fa-link"></i></a>操作流程整理</h3>
+      <ol>
+<li>拉取最新的TargetBranch</li>
+<li>切换到开发分支</li>
+<li>执行rebase -i操作 ，根据实际情况来改写commit</li>
+</ol>
+
+        <h3 id="PS"   >
+          <a href="#PS" class="heading-link"><i class="fas fa-link"></i></a>PS</h3>
+      <ol>
+<li>对于是从最新的TargetBranch通过git flow 创建出来的分支也是可以使用rebase的命令来整理commit的</li>
+</ol>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="http://example.com">Ray Chen</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="http://example.com/2020/01/21/git-rebase/">http://example.com/2020/01/21/git-rebase/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="http://example.com/tags/git/">git</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2020/01/22/gomodule/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">gomodule</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2019/10/06/prometheus-scrape/"><span class="paginator-prev__text">Prometheus(1)- 数据抓取源码阅读</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#git-commit-%E6%95%B4%E7%90%86%E5%B0%8F%E6%8F%90%E7%A4%BA"><span class="toc-number">1.</span> <span class="toc-text">
+          git commit 整理小提示</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98"><span class="toc-number">1.0.1.</span> <span class="toc-text">
+          问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC%E4%BD%9C%E7%94%A8"><span class="toc-number">1.0.2.</span> <span class="toc-text">
+          引导作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%B7%A5%E5%85%B7"><span class="toc-number">1.0.3.</span> <span class="toc-text">
+          使用工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E4%BE%8B%E5%AD%90"><span class="toc-number">1.0.4.</span> <span class="toc-text">
+          操作例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Git-rebase-%E5%8F%82%E6%95%B0%E8%AE%B2%E8%A7%A3"><span class="toc-number">1.0.5.</span> <span class="toc-text">
+          Git rebase 参数讲解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%95%B4%E7%90%86"><span class="toc-number">1.0.6.</span> <span class="toc-text">
+          操作流程整理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PS"><span class="toc-number">1.0.7.</span> <span class="toc-text">
+          PS</span></a></li></ol></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/header.jpeg" alt="avatar"></div><p class="sidebar-ov-author__text">Believe in Goods in People</p></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">14</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">0</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">6</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Ray Chen</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.3.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.6.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="/js/utils.js?v=2.6.1"></script><script src="/js/stun-boot.js?v=2.6.1"></script><script src="/js/scroll.js?v=2.6.1"></script><script src="/js/header.js?v=2.6.1"></script><script src="/js/sidebar.js?v=2.6.1"></script></body></html>
